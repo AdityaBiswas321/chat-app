@@ -9,18 +9,16 @@ function HandyVideoSync() {
   const [mediaList, setMediaList] = useState([]);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [randomPlayMode, setRandomPlayMode] = useState(false);
-  const [playedMediaIndices, setPlayedMediaIndices] = useState([]);
 
   const extractBaseName = (filename) => {
     if (!filename || typeof filename !== 'string') {
-      console.error('Filename is undefined, null, or not a string:', filename);
-      return null;
+        console.error('Filename is undefined, null, or not a string:', filename);
+        return null;
     }
     const lastDotIndex = filename.lastIndexOf('.');
     if (lastDotIndex === -1) {
-      console.warn('No extension found in the filename:', filename);
-      return filename.trim(); // Return the full name if no extension is found
+        console.warn('No extension found in the filename:', filename);
+        return filename.trim(); // Return the full name if no extension is found
     }
     let baseName = filename.substring(0, lastDotIndex).trim();
 
@@ -28,12 +26,13 @@ function HandyVideoSync() {
     baseName = baseName.replace(/^0+/, '');
 
     if (!baseName) {
-      console.error('Base name could not be extracted from filename:', filename);
+        console.error('Base name could not be extracted from filename:', filename);
     } else {
-      console.log('Extracted base name:', baseName);
+        console.log('Extracted base name:', baseName);
     }
     return baseName;
-  };
+};
+
 
   const handleFolderUpload = (event, type) => {
     const files = Array.from(event.target.files); // Convert FileList to Array
@@ -73,61 +72,66 @@ function HandyVideoSync() {
     }
   };
 
-  const initHandy = async () => {
-    if (!handy) {  // Initialize only if handy is not already initialized
+  useEffect(() => {
+    const initHandy = async () => {
       const newHandy = Handy.init();
       try {
         await newHandy.connect(connectionKey);
         setHandy(newHandy);
         setIsConnected(true);
         console.log('Handy connected!');
+
+        // Automatically upload script for the current video when connected
+        if (mediaList[currentMediaIndex]?.script) {
+          await uploadAndSetScript(mediaList[currentMediaIndex].script);
+        }
       } catch (error) {
         console.error('Failed to initialize or connect Handy:', error);
         setIsConnected(false);
       }
-    }
-  };
+    };
 
-  useEffect(() => {
-    if (connectionKey && !isConnected) {
+    if (connectionKey) {
       initHandy();
     }
 
     return () => {
-      if (handy && isConnected) {
+      if (handy) {
         console.log('Disconnecting Handy...');
         handy.disconnect();
-        setIsConnected(false);
       }
     };
-  }, [connectionKey]);
+  }, [connectionKey, currentMediaIndex, mediaList]);
 
   const uploadAndSetScript = async (scriptUrl) => {
     try {
-      if (!handy || typeof handy.setScript !== 'function') {
-        console.error('Handy device is not initialized or does not support setScript.');
-        return;
-      }
+        if (!handy || typeof handy.setScript !== 'function') {
+            console.error('Handy device is not initialized or does not support setScript.');
+            return;
+        }
+        
+        // Retry logic
+        const retryUpload = async (retries) => {
+            while (retries > 0) {
+                try {
+                    await handy.setScript(scriptUrl);
+                    console.log('Script uploaded and set successfully.');
+                    return;
+                } catch (error) {
+                    console.error('Failed to upload or set script. Retrying...', error);
+                    retries--;
+                    await new Promise(res => setTimeout(res, 1000)); // 1-second delay before retry
+                }
+            }
+            console.error('Failed to upload or set script after multiple attempts.');
+        };
 
-      // Fetch the script file as text
-      const response = await fetch(scriptUrl);
-      const scriptText = await response.text();
-
-      // Upload the script using Handy's upload method
-      const scriptData = await Handy.uploadDataToServer(scriptText);
-      setMediaList((prevMediaList) => {
-        const newMediaList = [...prevMediaList];
-        newMediaList[currentMediaIndex] = { ...newMediaList[currentMediaIndex], scriptUrl: scriptData };
-        return newMediaList;
-      });
-
-      // Set the uploaded script URL in Handy
-      await handy.setScript(scriptData);
-      console.log('Script uploaded and set successfully.');
+        await retryUpload(3); // Retry 3 times before giving up
     } catch (error) {
-      console.error('Failed to upload or set script:', error);
+        console.error('Failed to upload or set script:', error);
     }
-  };
+};
+
 
   const handlePlayPause = async (play) => {
     const { script, video } = mediaList[currentMediaIndex];
@@ -141,26 +145,11 @@ function HandyVideoSync() {
 
     if (play) {
       try {
-        // Ensure the Handy is connected
-        if (!handy || !isConnected) {
-          console.error('Handy is not connected. Attempting to reconnect...');
-          await initHandy();
-          if (!handy || !isConnected) {
-            console.error('Failed to connect to Handy. Playback cannot start.');
-            return;
-          }
-        }
-
         await uploadAndSetScript(script);
-
-        // Log script data for debugging
-        console.log(`Script being used:`, script);
 
         // Add a delay to ensure the script is fully uploaded
         await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
 
-        // Start playback
-        console.log('Starting playback...');
         await handy.hsspPlay();
         videoElement.play();
         console.log('Playback started.');
@@ -187,79 +176,37 @@ function HandyVideoSync() {
     const videoElement = document.getElementById('video-player');
     videoElement.pause();
 
-    if (mediaList[index]?.script && !mediaList[index].isScriptSet) {
+    if (mediaList[index]?.script) {
       await uploadAndSetScript(mediaList[index].script);
-      mediaList[index].isScriptSet = true;
       console.log('Script set for selected media.');
     }
   };
 
-  const handleVideoEnd = async () => {
-    let nextIndex;
-
-    if (randomPlayMode) {
-      const unplayedIndices = mediaList
-        .map((_, index) => index)
-        .filter((index) => !playedMediaIndices.includes(index));
-
-      if (unplayedIndices.length === 0) {
-        // All media has been played, reset the played list
-        setPlayedMediaIndices([]);
-        nextIndex = Math.floor(Math.random() * mediaList.length);
-      } else {
-        nextIndex = unplayedIndices[Math.floor(Math.random() * unplayedIndices.length)];
-      }
-
-      setPlayedMediaIndices((prev) => [...prev, nextIndex]);
-    } else {
-      nextIndex = (currentMediaIndex + 1) % mediaList.length;
-    }
-
-    setCurrentMediaIndex(nextIndex);
-
-    // Automatically upload and set the next script after a delay
-    if (mediaList[nextIndex]?.script) {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay
-      await uploadAndSetScript(mediaList[nextIndex].script);
-      handlePlayPause(true); // Start playing the next video and script
-    }
-  };
-
-  useEffect(() => {
-    const videoElement = document.getElementById('video-player');
-
-    if (videoElement) {
-      videoElement.addEventListener('ended', handleVideoEnd);
-
-      return () => {
-        videoElement.removeEventListener('ended', handleVideoEnd);
-      };
-    }
-  }, [currentMediaIndex, mediaList, randomPlayMode, playedMediaIndices]);
-
-  const syncScriptWithVideo = async (currentTime) => {
-    if (!handy || !isConnected || !mediaList[currentMediaIndex]?.scriptUrl) return;
-
+  const initHandy = async () => {
+    const newHandy = Handy.init();
     try {
-      await handy.hsspSeekTo(currentTime);
-      console.log(`Synchronized script with video time: ${currentTime}`);
+        await newHandy.connect(connectionKey);
+        setHandy(newHandy);
+        setIsConnected(true);
+        console.log('Handy connected!');
+
+        // Check if the device supports the setScript method
+        if (typeof newHandy.setScript !== 'function') {
+            console.error('Handy device is not initialized or does not support setScript.');
+            return;
+        }
+
+        // Automatically upload script for the current video when connected
+        if (mediaList[currentMediaIndex]?.script) {
+            await uploadAndSetScript(mediaList[currentMediaIndex].script);
+        }
     } catch (error) {
-      console.error('Failed to synchronize script with video:', error);
+        console.error('Failed to initialize or connect Handy:', error);
+        setIsConnected(false);
     }
-  };
+};
 
-  useEffect(() => {
-    const videoElement = document.getElementById('video-player');
 
-    if (videoElement) {
-      const handleTimeUpdate = () => syncScriptWithVideo(videoElement.currentTime);
-      videoElement.addEventListener('timeupdate', handleTimeUpdate);
-
-      return () => {
-        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
-      };
-    }
-  }, [currentMediaIndex, mediaList, isConnected]);
 
   return (
     <div className="handy-video-sync">
@@ -307,25 +254,6 @@ function HandyVideoSync() {
         <button onClick={() => handlePlayPause(!isPlaying)}>
           {isPlaying ? 'Pause' : 'Play'}
         </button>
-      </div>
-
-      <div className="random-play-mode">
-        <label>
-          <input
-            type="radio"
-            checked={randomPlayMode}
-            onChange={() => setRandomPlayMode(true)}
-          />
-          Random Play Mode
-        </label>
-        <label>
-          <input
-            type="radio"
-            checked={!randomPlayMode}
-            onChange={() => setRandomPlayMode(false)}
-          />
-          Sequential Play Mode
-        </label>
       </div>
     </div>
   );

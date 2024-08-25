@@ -9,8 +9,6 @@ function HandyVideoSync() {
   const [mediaList, setMediaList] = useState([]);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [randomPlayMode, setRandomPlayMode] = useState(false);
-  const [playedMediaIndices, setPlayedMediaIndices] = useState([]);
 
   const extractBaseName = (filename) => {
     if (!filename || typeof filename !== 'string') {
@@ -195,26 +193,7 @@ function HandyVideoSync() {
   };
 
   const handleVideoEnd = async () => {
-    let nextIndex;
-
-    if (randomPlayMode) {
-      const unplayedIndices = mediaList
-        .map((_, index) => index)
-        .filter((index) => !playedMediaIndices.includes(index));
-
-      if (unplayedIndices.length === 0) {
-        // All media has been played, reset the played list
-        setPlayedMediaIndices([]);
-        nextIndex = Math.floor(Math.random() * mediaList.length);
-      } else {
-        nextIndex = unplayedIndices[Math.floor(Math.random() * unplayedIndices.length)];
-      }
-
-      setPlayedMediaIndices((prev) => [...prev, nextIndex]);
-    } else {
-      nextIndex = (currentMediaIndex + 1) % mediaList.length;
-    }
-
+    const nextIndex = (currentMediaIndex + 1) % mediaList.length;
     setCurrentMediaIndex(nextIndex);
 
     // Automatically upload and set the next script after a delay
@@ -235,7 +214,7 @@ function HandyVideoSync() {
         videoElement.removeEventListener('ended', handleVideoEnd);
       };
     }
-  }, [currentMediaIndex, mediaList, randomPlayMode, playedMediaIndices]);
+  }, [currentMediaIndex, mediaList]);
 
   const syncScriptWithVideo = async (currentTime) => {
     if (!handy || !isConnected || !mediaList[currentMediaIndex]?.scriptUrl) return;
@@ -307,25 +286,6 @@ function HandyVideoSync() {
         <button onClick={() => handlePlayPause(!isPlaying)}>
           {isPlaying ? 'Pause' : 'Play'}
         </button>
-      </div>
-
-      <div className="random-play-mode">
-        <label>
-          <input
-            type="radio"
-            checked={randomPlayMode}
-            onChange={() => setRandomPlayMode(true)}
-          />
-          Random Play Mode
-        </label>
-        <label>
-          <input
-            type="radio"
-            checked={!randomPlayMode}
-            onChange={() => setRandomPlayMode(false)}
-          />
-          Sequential Play Mode
-        </label>
       </div>
     </div>
   );

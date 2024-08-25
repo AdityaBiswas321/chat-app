@@ -9,8 +9,6 @@ function HandyVideoSync() {
   const [mediaList, setMediaList] = useState([]);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [randomPlayMode, setRandomPlayMode] = useState(false);
-  const [playedMediaIndices, setPlayedMediaIndices] = useState([]);
 
   const extractBaseName = (filename) => {
     if (!filename || typeof filename !== 'string') {
@@ -194,73 +192,6 @@ function HandyVideoSync() {
     }
   };
 
-  const handleVideoEnd = async () => {
-    let nextIndex;
-
-    if (randomPlayMode) {
-      const unplayedIndices = mediaList
-        .map((_, index) => index)
-        .filter((index) => !playedMediaIndices.includes(index));
-
-      if (unplayedIndices.length === 0) {
-        // All media has been played, reset the played list
-        setPlayedMediaIndices([]);
-        nextIndex = Math.floor(Math.random() * mediaList.length);
-      } else {
-        nextIndex = unplayedIndices[Math.floor(Math.random() * unplayedIndices.length)];
-      }
-
-      setPlayedMediaIndices((prev) => [...prev, nextIndex]);
-    } else {
-      nextIndex = (currentMediaIndex + 1) % mediaList.length;
-    }
-
-    setCurrentMediaIndex(nextIndex);
-
-    // Automatically upload and set the next script after a delay
-    if (mediaList[nextIndex]?.script) {
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay
-      await uploadAndSetScript(mediaList[nextIndex].script);
-      handlePlayPause(true); // Start playing the next video and script
-    }
-  };
-
-  useEffect(() => {
-    const videoElement = document.getElementById('video-player');
-
-    if (videoElement) {
-      videoElement.addEventListener('ended', handleVideoEnd);
-
-      return () => {
-        videoElement.removeEventListener('ended', handleVideoEnd);
-      };
-    }
-  }, [currentMediaIndex, mediaList, randomPlayMode, playedMediaIndices]);
-
-  const syncScriptWithVideo = async (currentTime) => {
-    if (!handy || !isConnected || !mediaList[currentMediaIndex]?.scriptUrl) return;
-
-    try {
-      await handy.hsspSeekTo(currentTime);
-      console.log(`Synchronized script with video time: ${currentTime}`);
-    } catch (error) {
-      console.error('Failed to synchronize script with video:', error);
-    }
-  };
-
-  useEffect(() => {
-    const videoElement = document.getElementById('video-player');
-
-    if (videoElement) {
-      const handleTimeUpdate = () => syncScriptWithVideo(videoElement.currentTime);
-      videoElement.addEventListener('timeupdate', handleTimeUpdate);
-
-      return () => {
-        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
-      };
-    }
-  }, [currentMediaIndex, mediaList, isConnected]);
-
   return (
     <div className="handy-video-sync">
       <div className="connection-input-wrapper">
@@ -307,25 +238,6 @@ function HandyVideoSync() {
         <button onClick={() => handlePlayPause(!isPlaying)}>
           {isPlaying ? 'Pause' : 'Play'}
         </button>
-      </div>
-
-      <div className="random-play-mode">
-        <label>
-          <input
-            type="radio"
-            checked={randomPlayMode}
-            onChange={() => setRandomPlayMode(true)}
-          />
-          Random Play Mode
-        </label>
-        <label>
-          <input
-            type="radio"
-            checked={!randomPlayMode}
-            onChange={() => setRandomPlayMode(false)}
-          />
-          Sequential Play Mode
-        </label>
       </div>
     </div>
   );
