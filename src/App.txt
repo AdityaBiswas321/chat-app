@@ -20,9 +20,11 @@ function HandyVideoSync() {
     const lastDotIndex = filename.lastIndexOf('.');
     if (lastDotIndex === -1) {
       console.warn('No extension found in the filename:', filename);
-      return filename.trim();
+      return filename.trim(); // Return the full name if no extension is found
     }
     let baseName = filename.substring(0, lastDotIndex).trim();
+
+    // Normalize base name by removing leading zeros
     baseName = baseName.replace(/^0+/, '');
 
     if (!baseName) {
@@ -34,7 +36,7 @@ function HandyVideoSync() {
   };
 
   const handleFolderUpload = (event, type) => {
-    const files = Array.from(event.target.files);
+    const files = Array.from(event.target.files); // Convert FileList to Array
     if (files.length > 0) {
       const newMediaList = [...mediaList];
 
@@ -43,17 +45,18 @@ function HandyVideoSync() {
         const baseName = extractBaseName(file.name);
 
         if (baseName) {
+          // Find or create a media entry for the base name
           let mediaEntry = newMediaList.find(
-            (media) =>
-              extractBaseName(media.videoName) === baseName ||
-              extractBaseName(media.scriptName) === baseName
+            (media) => extractBaseName(media.videoName) === baseName || extractBaseName(media.scriptName) === baseName
           );
 
           if (!mediaEntry) {
+            // Create a new media entry if one does not exist
             mediaEntry = { video: '', videoName: '', script: '', scriptName: '' };
             newMediaList.push(mediaEntry);
           }
 
+          // Update the entry with the new video or script information
           mediaEntry[type] = url;
           mediaEntry[`${type}Name`] = file.name;
 
@@ -64,14 +67,14 @@ function HandyVideoSync() {
         }
       });
 
-      console.log('Final media list after upload:', newMediaList);
+      console.log("Final media list after upload:", newMediaList);
 
       setMediaList(newMediaList);
     }
   };
 
   const initHandy = async () => {
-    if (!handy) {
+    if (!handy) {  // Initialize only if handy is not already initialized
       const newHandy = Handy.init();
       try {
         await newHandy.connect(connectionKey);
@@ -85,13 +88,11 @@ function HandyVideoSync() {
     }
   };
 
-  const handleConnectClick = () => {
+  useEffect(() => {
     if (connectionKey && !isConnected) {
       initHandy();
     }
-  };
 
-  useEffect(() => {
     return () => {
       if (handy && isConnected) {
         console.log('Disconnecting Handy...');
@@ -108,8 +109,11 @@ function HandyVideoSync() {
         return;
       }
 
+      // Fetch the script file as text
       const response = await fetch(scriptUrl);
       const scriptText = await response.text();
+
+      // Upload the script using Handy's upload method
       const scriptData = await Handy.uploadDataToServer(scriptText);
       setMediaList((prevMediaList) => {
         const newMediaList = [...prevMediaList];
@@ -117,6 +121,7 @@ function HandyVideoSync() {
         return newMediaList;
       });
 
+      // Set the uploaded script URL in Handy
       await handy.setScript(scriptData);
       console.log('Script uploaded and set successfully.');
     } catch (error) {
@@ -136,6 +141,7 @@ function HandyVideoSync() {
 
     if (play) {
       try {
+        // Ensure the Handy is connected
         if (!handy || !isConnected) {
           console.error('Handy is not connected. Attempting to reconnect...');
           await initHandy();
@@ -146,8 +152,14 @@ function HandyVideoSync() {
         }
 
         await uploadAndSetScript(script);
+
+        // Log script data for debugging
+        console.log(`Script being used:`, script);
+
+        // Add a delay to ensure the script is fully uploaded
         await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
 
+        // Start playback
         console.log('Starting playback...');
         await handy.hsspPlay();
         videoElement.play();
@@ -191,6 +203,7 @@ function HandyVideoSync() {
         .filter((index) => !playedMediaIndices.includes(index));
 
       if (unplayedIndices.length === 0) {
+        // All media has been played, reset the played list
         setPlayedMediaIndices([]);
         nextIndex = Math.floor(Math.random() * mediaList.length);
       } else {
@@ -204,6 +217,7 @@ function HandyVideoSync() {
 
     setCurrentMediaIndex(nextIndex);
 
+    // Automatically upload and set the next script after a delay
     if (mediaList[nextIndex]?.script) {
       await new Promise((resolve) => setTimeout(resolve, 1000)); // 1-second delay
       await uploadAndSetScript(mediaList[nextIndex].script);
@@ -211,7 +225,6 @@ function HandyVideoSync() {
     }
   };
 
-  // Handle the video end event
   useEffect(() => {
     const videoElement = document.getElementById('video-player');
 
@@ -224,36 +237,29 @@ function HandyVideoSync() {
     }
   }, [currentMediaIndex, mediaList, randomPlayMode, playedMediaIndices]);
 
-  // Only sync the script when the user seeks
-  useEffect(() => {
-    const videoElement = document.getElementById('video-player');
-
-    if (videoElement) {
-      const handleSeeked = () => {
-        const currentTime = videoElement.currentTime;
-        syncScriptWithVideo(currentTime); // Sync script only when user seeks
-      };
-
-      videoElement.addEventListener('seeked', handleSeeked);
-
-      return () => {
-        videoElement.removeEventListener('seeked', handleSeeked);
-      };
-    }
-  }, [currentMediaIndex, mediaList, isConnected]);
-
-  // No need to sync constantly, remove the timeupdate listener
-  // This is the updated syncScriptWithVideo method, to ensure only seek syncing happens
   const syncScriptWithVideo = async (currentTime) => {
     if (!handy || !isConnected || !mediaList[currentMediaIndex]?.scriptUrl) return;
 
     try {
-      await handy.hsspPlay(currentTime); // Sync the script to the current time after seeking
-      console.log(`Synchronized script with video after seek: ${currentTime}`);
+      await handy.hsspSeekTo(currentTime);
+      console.log(`Synchronized script with video time: ${currentTime}`);
     } catch (error) {
-      console.error('Failed to synchronize script with video after seek:', error);
+      console.error('Failed to synchronize script with video:', error);
     }
   };
+
+  useEffect(() => {
+    const videoElement = document.getElementById('video-player');
+
+    if (videoElement) {
+      const handleTimeUpdate = () => syncScriptWithVideo(videoElement.currentTime);
+      videoElement.addEventListener('timeupdate', handleTimeUpdate);
+
+      return () => {
+        videoElement.removeEventListener('timeupdate', handleTimeUpdate);
+      };
+    }
+  }, [currentMediaIndex, mediaList, isConnected]);
 
   return (
     <div className="handy-video-sync">
@@ -265,7 +271,6 @@ function HandyVideoSync() {
           onChange={(e) => setConnectionKey(e.target.value)}
           placeholder="Enter Handy Connection Key"
         />
-        <button onClick={handleConnectClick}>Connect</button>
         <span className={`connection-status-icon ${isConnected ? 'connected' : 'disconnected'}`}>
           {isConnected ? '✅' : '❌'}
         </span>
