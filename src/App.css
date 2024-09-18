@@ -1,14 +1,38 @@
 .handy-video-sync {
   text-align: center;
   background: linear-gradient(135deg, #6a3093 0%, #a044ff 100%);
+  padding: 40px;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Changed from center to flex-start to move to the top */
+}
+
+.video-and-connection-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 90%;
+  max-width: 1200px;
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.1);
   padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .connection-input-wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  margin-bottom: 20px;
+  align-items: flex-start;
+  margin-right: 20px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .connection-key-input {
@@ -17,6 +41,7 @@
   width: 300px;
   border: 2px solid #7B1FA2;
   border-radius: 5px;
+  margin-bottom: 10px;
   transition: border-color 0.3s ease-in-out;
   outline: none;
 }
@@ -27,8 +52,8 @@
 }
 
 .connection-status-icon {
-  margin-left: 10px;
   font-size: 24px;
+  margin-top: 10px;
 }
 
 .file-input-wrapper {
@@ -37,7 +62,7 @@
   border-radius: 5px;
   overflow: hidden;
   background: linear-gradient(135deg, #ff4081 0%, #ff79b0 100%);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .file-input-wrapper input[type="file"] {
@@ -75,8 +100,40 @@
   transform: scale(0.95);
 }
 
+.media-selection {
+  max-height: 300px; /* Reduced height for better visibility of video and AI response */
+  overflow-y: auto;
+  width: 400px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+.media-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.media-item:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
 .video-container {
   margin-bottom: 20px;
+  max-width: 800px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .controls button {
@@ -94,14 +151,58 @@
   background-color: #ec407a;
 }
 
-.media-selection {
+.random-play-mode {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
   margin-top: 20px;
+  color: white;
 }
 
-.media-selection button {
+.handy-video-sync textarea {
+  width: 100%;
+  max-width: 600px;
+  height: 100px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #7B1FA2;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.handy-video-sync textarea:focus {
+  border-color: #C2185B;
+  box-shadow: 0 0 8px rgba(194, 24, 91, 0.6);
+}
+
+.llm-connector {
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.llm-connector textarea {
+  width: 100%;
+  max-width: 500px;
+  height: 100px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #7B1FA2;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.llm-connector textarea:focus {
+  border-color: #C2185B;
+  box-shadow: 0 0 8px rgba(194, 24, 91, 0.6);
+}
+
+.llm-connector button {
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
@@ -109,10 +210,32 @@
   color: white;
   border: none;
   border-radius: 5px;
-  margin-bottom: 10px;
   transition: background-color 0.3s;
 }
 
-.media-selection button:hover {
+.llm-connector button:hover {
   background-color: #ec407a;
+}
+
+
+.llm-connector {
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto 20px; /* Added bottom margin to ensure space */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10; /* Ensure it stays on top */
+  position: relative; /* Ensure no overlap with other elements */
+}
+
+.llm-connector p {
+  margin-top: 15px;
+  color: #fff; /* White text for visibility */
+  font-size: 16px;
+  white-space: pre-wrap;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark background */
+  padding: 10px;
+  border-radius: 5px;
 }
