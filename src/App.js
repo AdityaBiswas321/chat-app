@@ -15,7 +15,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Therapeutic Video Player with AI</h1>
+      <h1>Video-Script Player with AI</h1>
 
       {/* LLMConnector handles the AI interaction */}
       <LLMConnector onCategorySelect={handleCategorySelect} />
