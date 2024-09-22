@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import HandyVideoSync from './components/HandyVideoSync.js';
-import LLMConnector from './components/AI';
-import './App.css'; // Add custom styling
+import React, { useState } from "react";
+// import HandyVideoSync from './components/HandyVideoSync.js';
+import LLMConnector from "./components/AI";
+import "./App.css"; // Add custom styling
+import HandyController from "./components/Hardcode"; // The new HandyController component
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [apiCallCount, setApiCallCount] = useState(0); // Counter to track AI API calls
 
   // Handle category selection and increment the API call counter
@@ -19,9 +20,14 @@ function App() {
 
       {/* LLMConnector handles the AI interaction */}
       <LLMConnector onCategorySelect={handleCategorySelect} />
+      {/* HandyController directly operates the Handy device based on AI's selected category */}
+      <HandyController
+        selectedCategory={selectedCategory}
+        apiCallCount={apiCallCount}
+      />
 
       {/* HandyVideoSync plays the videos based on the AI's selected category */}
-      <HandyVideoSync selectedCategory={selectedCategory} apiCallCount={apiCallCount} />
+      {/* <HandyVideoSync selectedCategory={selectedCategory} apiCallCount={apiCallCount} /> */}
     </div>
   );
 }
