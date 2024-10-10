@@ -52,7 +52,7 @@ The characters you create will not only engage in conversation with the user but
 **Example Dialogue:**
 **Mistress:** I tighten my grip just slightly, enough to remind you of the power I hold over you. firmStroke() Feel that? You’re completely under my control, and every touch I make pushes you further into submission.
    `,
-    commands: "",
+    commands: HANDY_COMMANDS,
   },
   mistress: {
     name: "Mistress",

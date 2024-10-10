@@ -82,10 +82,11 @@ const handleSend = async (message) => {
   ];
 
   // Combine the character's prompt and commands for the system message
-  const systemMessage = `
-    ${characters[selectedCharacter]?.prompt || ''}
-    ${characters[selectedCharacter]?.commands || ''}
-  `;
+  const systemMessage = selectedCharacter === 'characterbuilder'
+    ? `${characters[selectedCharacter]?.prompt || ''}`  // Only include prompt if 'characterbuilder'
+    : `${characters[selectedCharacter]?.prompt || ''}
+       ${characters[selectedCharacter]?.commands || ''}`;  // Include both prompt and commands for others
+
 
   const payload = {
     model: "gpt-4o-mini", // Use GPT-4 if available
