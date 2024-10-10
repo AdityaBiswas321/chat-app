@@ -47,6 +47,24 @@ function HandyController({ selectedCategory, apiCallCount }) {
     }
   };
 
+  const handleDisconnect = async () => {
+    if (handy && isConnected) {
+      try {
+        // Reset stroke zone
+        await handy.setStrokeZone({ min: 0, max: 100 }); // Reset to default range
+        await handy.setHampVelocity(50); // Reset velocity to default
+        console.log('Handy settings reset to default');
+        
+        // Disconnect Handy
+        await handy.disconnect(true); // true to remove all stored states
+        setIsConnected(false);
+        console.log('Handy disconnected');
+      } catch (error) {
+        console.error('Failed to reset settings or disconnect:', error);
+      }
+    }
+  };
+
   // Clean up connection on component unmount
   useEffect(() => {
     if (handy && isConnected) {
@@ -100,21 +118,23 @@ function HandyController({ selectedCategory, apiCallCount }) {
   }, [apiCallCount, isConnected]);  // Trigger the appropriate action whenever apiCallCount or connection status changes
 
   return (
-    <div className="handy-controller">
-      <div className="connection-input-wrapper">
-        <input
-          type="text"
-          className="connection-key-input"
-          value={connectionKey}
-          onChange={(e) => setConnectionKey(e.target.value)}
-          placeholder="Enter Handy Connection Key"
-        />
-        <button onClick={handleConnectClick}>Connect</button>
-        <span className={`connection-status-icon ${isConnected ? 'connected' : 'disconnected'}`}>
-          {isConnected ? '✅' : '❌'}
-        </span>
-      </div>
-    </div>
+<div className="handy-controller">
+  <div className="connection-input-wrapper">
+    <input
+      type="text"
+      className="connection-key-input"
+      value={connectionKey}
+      onChange={(e) => setConnectionKey(e.target.value)}
+      placeholder="Enter Handy Connection Key"
+    />
+    <button onClick={handleConnectClick}>Connect</button>
+    <button onClick={handleDisconnect}>Disconnect & Reset</button>
+    <span className={`connection-status-icon ${isConnected ? 'connected' : 'disconnected'}`}>
+      {isConnected ? '✅' : '❌'}
+    </span>
+  </div>
+</div>
+
   );
 }
 

@@ -18,13 +18,15 @@ function App() {
     <div className="App">
       <h1>Video-Script Player with AI</h1>
 
-      {/* LLMConnector handles the AI interaction */}
-      <LLMConnector onCategorySelect={handleCategorySelect} />
-      {/* HandyController directly operates the Handy device based on AI's selected category */}
       <HandyController
         selectedCategory={selectedCategory}
         apiCallCount={apiCallCount}
       />
+
+      {/* LLMConnector handles the AI interaction */}
+      <LLMConnector onCategorySelect={handleCategorySelect} />
+      {/* HandyController directly operates the Handy device based on AI's selected category */}
+      
 
       {/* HandyVideoSync plays the videos based on the AI's selected category */}
       {/* <HandyVideoSync selectedCategory={selectedCategory} apiCallCount={apiCallCount} /> */}
