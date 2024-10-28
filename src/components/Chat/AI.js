@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import CharacterManager from './Character/CharacterManager';
-import { DEFAULT_CHARACTERS } from './Character/CharacterPrompts';
+import CharacterManager from '../Character/CharacterManager';
+import { DEFAULT_CHARACTERS } from '../Character/CharacterPrompts';
 import ChatAndInput from './ChatAndInput';
 import styles from './ChatAppComponents.module.css';
 

@@ -132,3 +132,60 @@ nav {
     background-color: #48a862;
   }
   
+
+/* Mobile-specific adjustments in app.css */
+@media (max-width: 600px) {
+  /* General app padding to prevent overflow */
+  .App {
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Navbar adjustments */
+  nav {
+    padding: 8px 10px;
+    box-shadow: none; /* Remove shadow on mobile */
+    margin-bottom: 12px;
+  }
+
+  nav ul {
+    flex-direction: column; /* Stack links vertically */
+    gap: 10px;
+    padding-left: 10px;
+  }
+
+  nav a {
+    font-size: 1rem;
+    padding: 6px 12px;
+  }
+
+  /* Header adjustments */
+  .header {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .help-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+  }
+
+  /* Modal styling adjustments */
+  .modal-overlay {
+    padding: 8px;
+    align-items: flex-start; /* Align modal towards top on mobile */
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 400px;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .modal-content button {
+    width: 100%; /* Full-width button for mobile */
+  }
+}

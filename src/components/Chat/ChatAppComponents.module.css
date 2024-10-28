@@ -142,3 +142,81 @@
     margin-bottom: 20px;
     color: #5a9;
   }
+
+
+
+/* Mobile-specific adjustments */
+@media (max-width: 600px) {
+  /* Make main panels stack */
+  .llm-connector {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-panel,
+  .right-panel {
+    flex: 1;
+    padding: 8px;
+    max-width: 100%;
+    box-sizing: border-box; /* Prevents overflow by including padding within width */
+  }
+
+  /* Adjust chat history container */
+  .chat-history {
+    max-height: 200px; /* Adjust for mobile */
+    padding: 8px;
+  }
+
+  /* Compact input section */
+  .input-section {
+    gap: 8px;
+  }
+
+  .input-section input,
+  .input-section textarea {
+    width: 100%; /* Ensure full width for mobile */
+    padding: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box; /* Include padding within width */
+  }
+
+  .input-section button {
+    width: 100%; /* Ensure full width for mobile */
+    padding: 8px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+
+  /* CharacterManager adjustments */
+  .character-manager {
+    padding: 8px;
+  }
+
+  .character-manager select,
+  .character-manager input,
+  .character-manager textarea {
+    width: 100%; /* Ensure full width for mobile */
+    padding: 6px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+
+  .character-manager button {
+    width: 100%; /* Ensure full width for mobile */
+    padding: 8px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+  }
+
+  /* Connection status and icons */
+  .connection-status-icon {
+    font-size: 1.2em;
+  }
+
+  /* Tighter layout for connection input wrapper */
+  .connection-input-wrapper {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+

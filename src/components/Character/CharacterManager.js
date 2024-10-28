@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DEFAULT_CHARACTERS, createCustomCharacter } from './CharacterPrompts';
-import styles from '../ChatAppComponents.module.css';
+import styles from '../Chat/ChatAppComponents.module.css';
 
 const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, onDeleteCharacter, onUpdateCharacter }) => {
   const [selectedCharacter, setSelectedCharacter] = useState('mistress');
