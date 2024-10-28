@@ -1,0 +1,133 @@
+/* General App Styling */
+.App {
+  text-align: center;
+  background-color: #121212; /* Dark background */
+  color: #fff; /* White text for contrast */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #50c878; /* Greenish color for headers */
+}
+
+.handy-video-sync, .llm-connector {
+  background-color: #1c1c1c; /* Dark gray background for panels */
+  color: #ddd; /* Lighter text inside panels */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Soft shadow for panels */
+  width: 90%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+/* Inputs and Buttons */
+textarea, input[type="text"], input[type="file"] {
+  background-color: #2a2a2a; /* Darker input background */
+  color: #ddd; /* Light text color for inputs */
+  border: 1px solid #555; /* Subtle border */
+  border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+}
+
+button {
+  background-color: #50c878; /* Greenish button */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #48a862; /* Slightly darker green on hover */
+}
+
+button:disabled {
+  background-color: #777; /* Gray for disabled buttons */
+  cursor: not-allowed;
+}
+
+/* File input buttons */
+.file-input-wrapper label {
+  background-color: #50c878; /* Same button style for file inputs */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+/* Media and controls styling */
+.media-item button {
+  background-color: #50c878;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.controls button {
+  background-color: #50c878;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.controls button:hover {
+  background-color: #48a862;
+}
+
+.random-play-mode {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.random-play-mode label {
+  color: #ddd; /* Lighter text for labels */
+}
+
+.video-container {
+  margin-top: 20px;
+}
+
+/* Main layout */
+.main-layout {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.left-panel, .right-panel {
+  flex: 1;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  background-color: #1c1c1c; /* Dark gray panels */
+  max-width: 600px;
+  margin: 20px 0;
+}
+
+/* Adjustments for responsiveness */
+@media screen and (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .left-panel, .right-panel {
+    max-width: 100%;
+  }
+}

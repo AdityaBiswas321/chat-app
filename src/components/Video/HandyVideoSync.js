@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import './HandyVideoSync.css';
 import * as Handy from '@ohdoki/handy-sdk';
+import styles from './VideoScriptApp.module.css';
 
 function HandyVideoSync({ selectedCategory, apiCallCount }) { // Accept selectedCategory from LLM
   const [connectionKey, setConnectionKey] = useState('');
@@ -79,17 +80,34 @@ function HandyVideoSync({ selectedCategory, apiCallCount }) { // Accept selected
   const initHandy = async () => {
     if (!handy) {
       const newHandy = Handy.init();
-      try {
-        await newHandy.connect(connectionKey);
-        setHandy(newHandy);
-        setIsConnected(true);
-        console.log('Handy connected!');
-      } catch (error) {
-        console.error('Failed to initialize or connect Handy:', error);
-        setIsConnected(false);
+      setHandy(newHandy);
+    }
+
+    try {
+      if (handy && connectionKey) {
+        const storedKey = await handy.getStoredKey();
+        if (!isConnected || (storedKey && storedKey !== connectionKey)) {
+          await handy.connect(connectionKey);
+          setIsConnected(true);
+          console.log('Handy connected!');
+        }
       }
+    } catch (error) {
+      console.error('Failed to initialize or connect Handy:', error);
+      setIsConnected(false);
     }
   };
+
+  // Auto-reconnect mechanism, checking connection status periodically
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (!isConnected && connectionKey) {
+        initHandy(); // Attempt to reconnect if disconnected
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(intervalId); // Clean up on component unmount
+  }, [isConnected, connectionKey, handy]);
 
   const handleConnectClick = () => {
     if (connectionKey && !isConnected) {
@@ -97,6 +115,7 @@ function HandyVideoSync({ selectedCategory, apiCallCount }) { // Accept selected
     }
   };
 
+  // Clean up connection on component unmount
   useEffect(() => {
     if (handy && isConnected) {
       return () => {
@@ -104,7 +123,7 @@ function HandyVideoSync({ selectedCategory, apiCallCount }) { // Accept selected
         setIsConnected(false);
       };
     }
-  }, [connectionKey]);
+  }, [handy, isConnected]);
 
   const uploadAndSetScript = async (scriptUrl) => {
     try {
@@ -187,6 +206,24 @@ function HandyVideoSync({ selectedCategory, apiCallCount }) { // Accept selected
     }
   };
 
+  const handleDisconnect = async () => {
+    if (handy && isConnected) {
+      try {
+        // Reset stroke zone
+        await handy.setStrokeZone({ min: 0, max: 100 }); // Reset to default range
+        await handy.setHampVelocity(50); // Reset velocity to default
+        console.log('Handy settings reset to default');
+        
+        // Disconnect Handy
+        await handy.disconnect(true); // true to remove all stored states
+        setIsConnected(false);
+        console.log('Handy disconnected');
+      } catch (error) {
+        console.error('Failed to reset settings or disconnect:', error);
+      }
+    }
+  };
+
   const handleVideoEnd = async () => {
     let nextIndex;
 
@@ -244,12 +281,27 @@ useEffect(() => {
 
 
     // Function to handle 'deny()' command
-    const handleDeny = () => {
+    const handleDeny = async () => {
     console.log("Deny triggered: Setting device to high position and holding.");
-    if (handy && isConnected) {
-        handy.setPosition(100); // Example to set the device position high up
-    }
+    if (!handy || !isConnected) {
+        console.error('Handy is not connected');
+        return;
+      }
+      try {
+        await handy.setStrokeZone({ min: 100, max: 100 }); // Set to 100% (topmost position)
+        await handy.hampPlay(); // Start the movement to go to the top
+    
+        setTimeout(async () => {
+          await handy.hampStop(); // Stop all movement once the top is reached
+          console.log('Deny action triggered: Device moved to the highest position and stopped.');
+        }, 500); // Adjust timeout to ensure the device reaches the top
+    
+      } catch (error) {
+        console.error('Error during deny action:', error);
+      }
     };
+
+    
 
     // Function to handle 'stop()' command
     const handleStop = () => {
@@ -261,7 +313,7 @@ useEffect(() => {
         }
     
         if (handy && isConnected) {
-        handy.hsspStop(); // Stop the script via the Handy API
+        handy.hampStop(); // Stop the device's motion
         }
     
         setIsPlaying(false); // Update state to reflect that playback is stopped
@@ -311,98 +363,101 @@ useEffect(() => {
   };
 
   return (
-    <div className="handy-video-sync">
-    <div className="video-and-connection-wrapper">
-      <div className="connection-input-wrapper">
+    <div className={styles["handy-video-sync"]}>
+    <div className={styles["video-container"]}>
+      {mediaList[currentMediaIndex]?.video && (
+        <video
+          id="video-player"
+          controls
+          src={mediaList[currentMediaIndex].video}
+          style={{ width: '100%', maxWidth: '800px' }}
+        ></video>
+      )}
+    </div>
+
+    <div className={styles["video-and-connection-wrapper"]}>
+      <div className={styles["connection-input-wrapper"]}>
         <input
           type="text"
-          className="connection-key-input"
+          className={styles["connection-key-input"]}
           value={connectionKey}
           onChange={(e) => setConnectionKey(e.target.value)}
           placeholder="Enter Handy Connection Key"
         />
         <button onClick={handleConnectClick}>Connect</button>
-        <span className={`connection-status-icon ${isConnected ? 'connected' : 'disconnected'}`}>
+        <button onClick={handleDisconnect}>Disconnect & Reset</button>
+        <span className={`${styles["connection-status-icon"]} ${isConnected ? styles.connected : styles.disconnected}`}>
           {isConnected ? '✅' : '❌'}
         </span>
       </div>
 
-      <div className="file-input-wrapper">
+      <div className={styles["file-input-wrapper"]}>
         <input type="file" id="script-input" onChange={(e) => handleFolderUpload(e, 'script')} webkitdirectory="true" multiple />
         <label htmlFor="script-input">Choose Script Folder</label>
       </div>
 
-      <div className="file-input-wrapper">
+      <div className={styles["file-input-wrapper"]}>
         <input type="file" id="video-input" onChange={(e) => handleFolderUpload(e, 'video')} webkitdirectory="true" multiple />
         <label htmlFor="video-input">Choose Video Folder</label>
       </div>
 
-      <div className="media-selection">
-  {mediaList.map((media, index) => (
-    <div key={index} className="media-item">
-      <button onClick={() => handleMediaSelection(index)}>
-        {media.videoName || `Video ${index + 1}`}
-      </button>
-      <span> + {media.scriptName || 'No Script'}</span>
+      <div className={styles["media-selection"]}>
+        {mediaList.map((media, index) => (
+          <div key={index} className={styles["media-item"]}>
+            <button onClick={() => handleMediaSelection(index)}>
+              {media.videoName || `Video ${index + 1}`}
+            </button>
+            <span> + {media.scriptName || 'No Script'}</span>
 
-      {/* Add radio buttons to classify video */}
-      <div>
-        <label>
-          <input
-            type="radio"
-            value="reward"
-            checked={media.category === 'reward'}
-            onChange={() => handleCategoryChange(index, 'reward')}
-          />
-          Reward
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="punishment"
-            checked={media.category === 'punishment'}
-            onChange={() => handleCategoryChange(index, 'punishment')}
-          />
-          Punishment
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="tease"
-            checked={media.category === 'tease'}
-            onChange={() => handleCategoryChange(index, 'tease')}
-          />
-          Tease
-        </label>
-        <label>
-          <input
-            type="radio"
-            value="edge"
-            checked={media.category === 'edge'}
-            onChange={() => handleCategoryChange(index, 'edge')}
-          />
-          Edge
-        </label>
-      </div>
-    </div>
-  ))}
-</div>
-
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  value="reward"
+                  checked={media.category === 'reward'}
+                  onChange={() => handleCategoryChange(index, 'reward')}
+                />
+                Reward
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="punishment"
+                  checked={media.category === 'punishment'}
+                  onChange={() => handleCategoryChange(index, 'punishment')}
+                />
+                Punishment
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="tease"
+                  checked={media.category === 'tease'}
+                  onChange={() => handleCategoryChange(index, 'tease')}
+                />
+                Tease
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="edge"
+                  checked={media.category === 'edge'}
+                  onChange={() => handleCategoryChange(index, 'edge')}
+                />
+                Edge
+              </label>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="video-container">
-        {mediaList[currentMediaIndex]?.video && (
-          <video id="video-player" controls src={mediaList[currentMediaIndex].video} style={{ width: '100%', maxWidth: '800px' }}></video>
-        )}
-      </div>
-
-      <div className="controls">
+      <div className={styles["controls"]}>
         <button onClick={() => handlePlayPause(!isPlaying)}>
           {isPlaying ? 'Pause' : 'Play'}
         </button>
       </div>
 
-      <div className="random-play-mode">
+      <div className={styles["random-play-mode"]}>
         <label>
           <input
             type="radio"
@@ -421,7 +476,9 @@ useEffect(() => {
         </label>
       </div>
     </div>
+  </div>
   );
+  
 }
 
 export default HandyVideoSync;

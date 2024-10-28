@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DEFAULT_CHARACTERS, createCustomCharacter } from './CharacterPrompts';
+import styles from '../ChatAppComponents.module.css';
 
 const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, onDeleteCharacter, onUpdateCharacter }) => {
   const [selectedCharacter, setSelectedCharacter] = useState('mistress');
@@ -73,7 +74,7 @@ const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, on
   };
 
   return (
-    <div className="character-manager">
+    <div className={styles["character-manager"]}>
     <h3>Select Character:</h3>
     <select value={selectedCharacter} onChange={handleCharacterSelect}>
       {Object.keys(characters).map((key) => (
@@ -82,7 +83,7 @@ const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, on
         </option>
       ))}
     </select>
-  
+
     <h3>{isEditing ? `Edit Character: ${newCharacterName}` : 'Add New Character'}</h3>
     <input
       type="text"
@@ -109,7 +110,7 @@ const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, on
     <button onClick={handleSwitchToAddMode}>
       Add New Character
     </button>
-  
+
     {isEditing && (
       <div>
         <h3>Delete Character</h3>

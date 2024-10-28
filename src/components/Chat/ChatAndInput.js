@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styles from './ChatAppComponents.module.css';
 
 const ChatAndInput = ({
   conversationHistory,
@@ -23,17 +24,17 @@ const ChatAndInput = ({
   };
 
   return (
-    <div className="chat-and-input">
-    <div className="chat-history">
+    <div className={styles["chat-and-input"]}>
+    <div className={styles["chat-history"]}>
       {conversationHistory.map((entry, index) => (
-        <div key={index} className={entry.role === 'user' ? 'user-message' : 'assistant-message'}>
+        <div key={index} className={entry.role === 'user' ? styles["user-message"] : styles["assistant-message"]}>
           <strong>{entry.role === 'user' ? 'You' : 'AI'}: </strong>
           {entry.content}
         </div>
       ))}
     </div>
-  
-    <div className="input-section">
+
+    <div className={styles["input-section"]}>
       <h3>Enter your OpenAI API Key:</h3>
       <input
         type="text"

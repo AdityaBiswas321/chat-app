@@ -3,6 +3,8 @@ import axios from 'axios';
 import CharacterManager from './Character/CharacterManager';
 import { DEFAULT_CHARACTERS } from './Character/CharacterPrompts';
 import ChatAndInput from './ChatAndInput';
+import styles from './ChatAppComponents.module.css';
+
 
 const LLMConnector = ({ onCategorySelect }) => {
   const [inputText, setInputText] = useState('');
@@ -211,29 +213,29 @@ const handleSend = async (message) => {
   };
 
   return (
-<div className="llm-connector">
-  <div className="left-panel">
-    <ChatAndInput
-      conversationHistory={conversationHistories[selectedCharacter] || []}
-      onSendMessage={handleSend}
-      onResetConversation={handleResetConversation}
-      onRemoveLastInteraction={handleRemoveLastInteraction}
-      apiKey={apiKey}
-      onApiKeyChange={handleApiKeyChange}
-      loading={loading}
-    />
-  </div>
+    <div className={styles["llm-connector"]}>
+    <div className={styles["left-panel"]}>
+      <ChatAndInput
+        conversationHistory={conversationHistories[selectedCharacter] || []}
+        onSendMessage={handleSend}
+        onResetConversation={handleResetConversation}
+        onRemoveLastInteraction={handleRemoveLastInteraction}
+        apiKey={apiKey}
+        onApiKeyChange={handleApiKeyChange}
+        loading={loading}
+      />
+    </div>
 
-  <div className="right-panel">
-    <CharacterManager
-      onCharacterChange={handleCharacterChange}
-      onAddNewCharacter={handleAddNewCharacter}
-      onUpdateCharacter={handleUpdateCharacter}
-      onDeleteCharacter={handleDeleteCharacter}
-      characters={characters}
-    />
+    <div className={styles["right-panel"]}>
+      <CharacterManager
+        onCharacterChange={handleCharacterChange}
+        onAddNewCharacter={handleAddNewCharacter}
+        onUpdateCharacter={handleUpdateCharacter}
+        onDeleteCharacter={handleDeleteCharacter}
+        characters={characters}
+      />
+    </div>
   </div>
-</div>
   );
 };
 

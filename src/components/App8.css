@@ -1,0 +1,161 @@
+/* App.css */
+
+/* General App Styling */
+.App {
+    text-align: center;
+    background-color: #1c1c1c;
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #5a9;
+  }
+  
+  /* Main Layout for LLMConnector and HandyController */
+  .llm-connector {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .left-panel {
+    flex: 3;
+    background-color: #2b2b2b;
+    padding: 16px;
+  }
+  
+  .right-panel {
+    flex: 1;
+    background-color: #1c1c1c;
+    color: white;
+    padding: 16px;
+  }
+  
+  /* ChatAndInput component */
+  .chat-and-input {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .chat-history {
+    flex-grow: 1;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 300px;
+  }
+  
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .input-section input,
+  .input-section textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #333;
+    border: 1px solid #444;
+    color: white;
+  }
+  
+  .input-section button {
+    padding: 10px;
+    background-color: #5a9;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .input-section button:disabled {
+    background-color: #777;
+    cursor: not-allowed;
+  }
+  
+  /* CharacterManager component */
+  .character-manager select,
+  .character-manager input,
+  .character-manager textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #444;
+    border: 1px solid #555;
+    color: white;
+  }
+  
+  .character-manager button {
+    padding: 10px;
+    background-color: #2a9;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .character-manager button:hover {
+    background-color: #39b;
+  }
+  
+  /* HandyController component */
+  .handy-controller {
+    margin: 16px 0;
+  }
+  
+  .connection-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .connection-key-input {
+    padding: 8px;
+    border: 1px solid #444;
+    background-color: #333;
+    color: white;
+    border-radius: 4px;
+    flex: 1;
+  }
+  
+  .connection-input-wrapper button {
+    padding: 8px 12px;
+    background-color: #5a9;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .connection-input-wrapper button:hover {
+    background-color: #48a;
+  }
+  
+  .connection-status-icon {
+    font-size: 1.5em;
+  }
+  
+  .connection-status-icon.connected {
+    color: green;
+  }
+  
+  .connection-status-icon.disconnected {
+    color: red;
+  }
+  
+  
+  
+  
+  
+  

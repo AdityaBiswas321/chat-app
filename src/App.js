@@ -1,36 +1,29 @@
-import React, { useState } from "react";
-// import HandyVideoSync from './components/HandyVideoSync.js';
-import LLMConnector from "./components/AI";
-import "./App.css"; // Add custom styling
-import HandyController from "./components/Hardcode"; // The new HandyController component
+// Main App.js
+import React from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import ChatPage from "./pages/ChatPage"; // Main chat component
+import VideoScriptPlayer from "./pages/VideoScriptPlayer.js"; // Small app component
+import "./App.css";
 
 function App() {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [apiCallCount, setApiCallCount] = useState(0); // Counter to track AI API calls
-
-  // Handle category selection and increment the API call counter
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setApiCallCount((prevCount) => prevCount + 1); // Increment the counter on every API call
-  };
-
   return (
-    <div className="App">
-      <h1>Video-Script Player with AI</h1>
+    <Router>
+      <div className="App">
+        {/* Navigation Bar */}
+        <nav>
+          <ul>
+            <li><Link to="/">Chat with Handy-LLM</Link></li>
+            <li><Link to="/video-script">Video-Script Player with AI</Link></li>
+          </ul>
+        </nav>
 
-      <HandyController
-        selectedCategory={selectedCategory}
-        apiCallCount={apiCallCount}
-      />
-
-      {/* LLMConnector handles the AI interaction */}
-      <LLMConnector onCategorySelect={handleCategorySelect} />
-      {/* HandyController directly operates the Handy device based on AI's selected category */}
-      
-
-      {/* HandyVideoSync plays the videos based on the AI's selected category */}
-      {/* <HandyVideoSync selectedCategory={selectedCategory} apiCallCount={apiCallCount} /> */}
-    </div>
+        {/* Routes for each page */}
+        <Routes>
+          <Route path="/" element={<ChatPage />} />
+          <Route path="/video-script" element={<VideoScriptPlayer />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

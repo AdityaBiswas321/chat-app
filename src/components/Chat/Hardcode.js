@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import * as Handy from '@ohdoki/handy-sdk';
 import { gentlePat, gentleStroke, firmGrip, handleDeny, handleStop, rapidHeadStroke, mouthCommand, threateningGrip, ultimateDrain, soothingTouch, punishPulse, slowAgonyStroke, baseGrip, initialSeizure, relentlessStroke, punishingSqueeze } from './HandyFunctions';
+import styles from './ChatAppComponents.module.css';
+
+
 
 function HandyController({ selectedCategory, apiCallCount }) {
   const [connectionKey, setConnectionKey] = useState('');
@@ -118,22 +121,22 @@ function HandyController({ selectedCategory, apiCallCount }) {
   }, [apiCallCount, isConnected]);  // Trigger the appropriate action whenever apiCallCount or connection status changes
 
   return (
-<div className="handy-controller">
-  <div className="connection-input-wrapper">
-    <input
-      type="text"
-      className="connection-key-input"
-      value={connectionKey}
-      onChange={(e) => setConnectionKey(e.target.value)}
-      placeholder="Enter Handy Connection Key"
-    />
-    <button onClick={handleConnectClick}>Connect</button>
-    <button onClick={handleDisconnect}>Disconnect & Reset</button>
-    <span className={`connection-status-icon ${isConnected ? 'connected' : 'disconnected'}`}>
-      {isConnected ? '✅' : '❌'}
-    </span>
+    <div className={styles["handy-controller"]}>
+    <div className={styles["connection-input-wrapper"]}>
+      <input
+        type="text"
+        className={styles["connection-key-input"]}
+        value={connectionKey}
+        onChange={(e) => setConnectionKey(e.target.value)}
+        placeholder="Enter Handy Connection Key"
+      />
+      <button onClick={handleConnectClick}>Connect</button>
+      <button onClick={handleDisconnect}>Disconnect & Reset</button>
+      <span className={`${styles["connection-status-icon"]} ${isConnected ? styles.connected : styles.disconnected}`}>
+        {isConnected ? '✅' : '❌'}
+      </span>
+    </div>
   </div>
-</div>
 
   );
 }
