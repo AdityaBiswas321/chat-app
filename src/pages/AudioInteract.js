@@ -4,21 +4,21 @@ import HandyController from "../components/Chat/Hardcode";
 import "../App.css"; // Import App.css for styling
 
 function HandsFreeChatApp() {
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(""); // Command keyword for HandyController
   const [responseText, setResponseText] = useState(""); // Store LLM response text
+  const [apiCallCount, setApiCallCount] = useState(0); // Counter to track API calls
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Toggle listening state
-  const toggleListening = () => setIsListening(!isListening);
+  // Handle detected commands from AI_Audio component
+  const handleCommandDetection = (command) => {
+    console.log("Command detected:", command);
+    setSelectedCategory(command); // Update the command for HandyController
+    setApiCallCount((prevCount) => prevCount + 1); // Increment the API call counter
+  };
 
-  // Handle LLM response and convert to audio
+  // Handle LLM response text from AI_Audio
   const handleLLMResponse = (response) => {
-    setResponseText(response);
-    setIsSpeaking(true); // Trigger speaking mode after receiving response
-    setSelectedCategory(response);
-
+    setResponseText(response); // Update response text to display on UI
   };
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
@@ -32,13 +32,14 @@ function HandsFreeChatApp() {
 
       {/* Handy Controller to activate commands */}
       <HandyController
-        selectedCategory={selectedCategory} // Command passed from LLM response
+        selectedCategory={selectedCategory} // Command passed from detected command in AI_Audio
+        apiCallCount={apiCallCount} // Track number of API calls
       />
 
-      {/* LLMConnector: Handles audio and LLM response */}
+      {/* AI_Audio: Handles audio input and response */}
       <AI_Audio
-        onLLMResponse={handleLLMResponse} // Process LLM response and detect commands
-        isSpeaking={isSpeaking}
+        onCategorySelect={handleCommandDetection} // Process detected commands
+        onLLMResponse={handleLLMResponse} // Process LLM response text
       />
 
       {/* Display LLM Response */}

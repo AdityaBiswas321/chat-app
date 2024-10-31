@@ -4,20 +4,20 @@ import axios from 'axios';
 import CharacterManager from '../Character/CharacterManager';
 import { DEFAULT_CHARACTERS } from '../Character/CharacterPrompts';
 
-const AI_Audio = ({ onCategorySelect }) => {
+const AI_Audio = ({ onCategorySelect = () => {} }) => {
   const [apiKey, setApiKey] = useState('');
   const [characters, setCharacters] = useState(DEFAULT_CHARACTERS);
   const [selectedCharacter, setSelectedCharacter] = useState('mistress');
-  const [isListening, setIsListening] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const recognitionRef = useRef(null);
-  const isInSessionRef = useRef(false);
-  const conversationRef = useRef({
+  const [conversationHistories, setConversationHistories] = useState({
     characterbuilder: [],
     mistress: [],
     teacher: [],
     therapist: [],
   });
+  const [isListening, setIsListening] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const recognitionRef = useRef(null);
+  const isInSessionRef = useRef(false);
 
   useEffect(() => {
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
@@ -58,6 +58,7 @@ const AI_Audio = ({ onCategorySelect }) => {
       recognitionRef.current.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         console.log("User said:", transcript);
+        addToConversationLog('User', transcript);
         handleAudioInput(transcript);
       };
 
@@ -129,19 +130,6 @@ const AI_Audio = ({ onCategorySelect }) => {
       'gentlepat()': 'gentlePat',
       'gentlestroke()': 'gentleStroke',
       'firmgrip()': 'firmGrip',
-      'deny()': 'deny',
-      'stop()': 'stop',
-      'rapidheadstroke()': 'rapidHeadStroke',
-      'mouthcommand()': 'mouthCommand',
-      'threateninggrip()': 'threateningGrip',
-      'ultimatedrain()': 'ultimateDrain',
-      'soothingtouch()': 'soothingTouch',
-      'punishpulse()': 'punishPulse',
-      'slowagonystroke()': 'slowAgonyStroke',
-      'basegrip()': 'baseGrip',
-      'initialseizure()': 'initialSeizure',
-      'relentlessstroke()': 'relentlessStroke',
-      'punishingsqueeze()': 'punishingSqueeze'
     };
 
     Object.entries(commandMappings).forEach(([trigger, command]) => {
@@ -159,23 +147,20 @@ const AI_Audio = ({ onCategorySelect }) => {
     }
 
     setIsLoading(true);
-
     const character = characters[selectedCharacter];
     const systemMessage = `${character.prompt}\n${character.commands || ''}`;
-    
-    // Include entire conversation history in payload, using conversationRef to ensure the latest data
+
+    // Get the full history for the selected character and add the new input
     const updatedHistory = [
       { role: 'system', content: systemMessage },
-      ...conversationRef.current[selectedCharacter],
-      { role: 'user', content: audioText }
+      ...conversationHistories[selectedCharacter],
+      { role: 'user', content: audioText },
     ];
 
     const payload = {
       model: "gpt-4o-mini",
-      messages: updatedHistory
+      messages: updatedHistory,
     };
-
-    console.log("Full conversation history before sending to API:", payload.messages);
 
     try {
       const result = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
@@ -187,20 +172,20 @@ const AI_Audio = ({ onCategorySelect }) => {
 
       if (result.data && result.data.choices && result.data.choices.length > 0) {
         const apiResponse = result.data.choices[0].message.content;
-        console.log("API Response:", apiResponse);
-
         detectCommand(apiResponse);
         speakResponse(apiResponse);
 
-        // Append AI's response to conversationRef to maintain updated conversation history
-        conversationRef.current[selectedCharacter] = [
-          ...conversationRef.current[selectedCharacter],
+        // Append the user input and AI response to the character's history
+        const newHistory = [
+          ...conversationHistories[selectedCharacter],
           { role: 'user', content: audioText },
-          { role: 'assistant', content: apiResponse }
+          { role: 'assistant', content: apiResponse },
         ];
-        console.log("Updated conversation history with assistant response:", conversationRef.current[selectedCharacter]);
-      } else {
-        console.error('No response from OpenAI API.');
+        
+        setConversationHistories({
+          ...conversationHistories,
+          [selectedCharacter]: newHistory,
+        });
       }
     } catch (error) {
       console.error('Error calling OpenAI API:', error);
@@ -209,17 +194,29 @@ const AI_Audio = ({ onCategorySelect }) => {
     }
   };
 
+  const addToConversationLog = (speaker, message) => {
+    setConversationHistories((prevHistories) => ({
+      ...prevHistories,
+      [selectedCharacter]: [
+        ...prevHistories[selectedCharacter],
+        { role: speaker.toLowerCase(), content: message },
+      ],
+    }));
+  };
+
   const resetConversation = () => {
-    conversationRef.current[selectedCharacter] = [];
-    console.log("Conversation history reset for:", selectedCharacter);
+    setConversationHistories((prevHistories) => ({
+      ...prevHistories,
+      [selectedCharacter]: [],
+    }));
   };
 
   const removeLastInteraction = () => {
-    const history = conversationRef.current[selectedCharacter];
-    if (history.length >= 2) {
-      conversationRef.current[selectedCharacter] = history.slice(0, -2);
-      console.log("Last interaction removed for:", selectedCharacter);
-    }
+    setConversationHistories((prevHistories) => {
+      const updatedHistory = [...prevHistories[selectedCharacter]];
+      if (updatedHistory.length >= 2) updatedHistory.splice(-2);
+      return { ...prevHistories, [selectedCharacter]: updatedHistory };
+    });
   };
 
   return (
@@ -237,7 +234,7 @@ const AI_Audio = ({ onCategorySelect }) => {
       {isLoading && <p>Loading...</p>}
 
       <div className="conversation-log">
-        {conversationRef.current[selectedCharacter]?.map((entry, index) => (
+        {conversationHistories[selectedCharacter]?.map((entry, index) => (
           <p key={index}>
             <strong>{entry.role === 'user' ? 'User' : 'AI'}:</strong> {entry.content}
           </p>
@@ -264,4 +261,4 @@ const AI_Audio = ({ onCategorySelect }) => {
   );
 };
 
-export default AI_Audio;
+export default AI_Audio
