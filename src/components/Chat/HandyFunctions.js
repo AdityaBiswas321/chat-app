@@ -22,8 +22,8 @@ export const gentleStroke = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 20, max: 40 }); // Medium stroke range
-    await handy.setHampVelocity(20); // Moderate speed
+    await handy.setStrokeZone({ min: 20, max: 50 }); // Medium stroke range
+    await handy.setHampVelocity(10); // Moderate speed
     console.log('gentleStroke action triggered on Handy');
   } catch (error) {
     console.error('Error during gentleStroke:', error);
@@ -37,8 +37,8 @@ export const firmGrip = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 30, max: 60 }); // Larger stroke range
-    await handy.setHampVelocity(30); // Stronger, faster strokes
+    await handy.setStrokeZone({ min: 10, max: 30 }); // Larger stroke range
+    await handy.setHampVelocity(20); // Stronger, faster strokes
     console.log('firmGrip action triggered on Handy');
   } catch (error) {
     console.error('Error during firmGrip:', error);
@@ -57,7 +57,7 @@ export const rapidHeadStroke = async (handy, isConnected) => {
     // Wait for the device to reach the top before starting the rapid stroke
     setTimeout(async () => {
       await handy.setStrokeZone({ min: 90, max: 100 }); // Rapid short strokes
-      await handy.setHampVelocity(20); // High speed for intense strokes
+      await handy.setHampVelocity(10); // High speed for intense strokes
       console.log('RapidHeadStroke action triggered: Intense strokes near the top.');
     }, 500); // Adjust the delay to allow time to reach the top
 
@@ -73,8 +73,8 @@ export const mouthCommand = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 70, max: 100 }); // Focus on the topmost area
-    await handy.setHampVelocity(30); // Slow, teasing speed
+    await handy.setStrokeZone({ min: 40, max: 100 }); // Focus on the topmost area
+    await handy.setHampVelocity(10); // Slow, teasing speed
     console.log('MouthCommand action triggered: Teasing at the tip.');
   } catch (error) {
     console.error('Error during mouthCommand:', error);
@@ -89,7 +89,7 @@ export const threateningGrip = async (handy, isConnected) => {
   try {
     await handy.hampPlay(); // Start the movement
     await handy.setStrokeZone({ min: 10, max: 20 }); // Middle to upper area strokes for intensity
-    await handy.setHampVelocity(50); // Faster strokes for intense pressure
+    await handy.setHampVelocity(25); // Faster strokes for intense pressure
     console.log('ThreateningGrip action triggered: Intense strokes.');
   } catch (error) {
     console.error('Error during threateningGrip:', error);
@@ -103,8 +103,8 @@ export const ultimateDrain = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 100, max: 100 }); // Full strokes for final release
-    await handy.setHampVelocity(40); // Maximum speed to trigger release
+    await handy.setStrokeZone({ min: 10, max: 100 }); // Full strokes for final release
+    await handy.setHampVelocity(35); // Maximum speed to trigger release
     console.log('UltimateDrain action triggered: Full release triggered.');
   } catch (error) {
     console.error('Error during ultimateDrain:', error);
@@ -118,8 +118,8 @@ export const soothingTouch = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 20, max: 40 }); // Gentle, slow strokes
-    await handy.setHampVelocity(20); // Very slow, comforting speed
+    await handy.setStrokeZone({ min: 10, max: 60 }); // Gentle, slow strokes
+    await handy.setHampVelocity(5); // Very slow, comforting speed
     console.log('SoothingTouch action triggered: Gentle and relaxing strokes.');
   } catch (error) {
     console.error('Error during soothingTouch:', error);
@@ -134,7 +134,7 @@ export const punishPulse = async (handy, isConnected) => {
   try {
     await handy.hampPlay(); // Start the movement
     await handy.setStrokeZone({ min: 80, max: 100 }); // Quick, sharp movements at the top
-    await handy.setHampVelocity(50); // High velocity for intense pulses
+    await handy.setHampVelocity(25); // High velocity for intense pulses
     console.log('PunishPulse action triggered: Jolting intense strokes.');
   } catch (error) {
     console.error('Error during punishPulse:', error);
@@ -163,8 +163,8 @@ export const baseGrip = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 0, max: 10 }); // Small movements near the base
-    await handy.setHampVelocity(50); // Moderate speed for a firm, controlling grip
+    await handy.setStrokeZone({ min: 0, max: 5 }); // Small movements near the base
+    await handy.setHampVelocity(15); // Moderate speed for a firm, controlling grip
     console.log('BaseGrip action triggered: Firm grip at the base.');
   } catch (error) {
     console.error('Error during baseGrip:', error);
@@ -193,8 +193,8 @@ export const relentlessStroke = async (handy, isConnected) => {
   }
   try {
     await handy.hampPlay(); // Start the movement
-    await handy.setStrokeZone({ min: 10, max: 60 }); // Full strokes to simulate relentless intensity
-    await handy.setHampVelocity(50); // Maximum speed for relentless strokes
+    await handy.setStrokeZone({ min: 5, max: 60 }); // Full strokes to simulate relentless intensity
+    await handy.setHampVelocity(20); // Maximum speed for relentless strokes
     console.log('RelentlessStroke action triggered: Maximum intensity strokes.');
   } catch (error) {
     console.error('Error during relentlessStroke:', error);
@@ -209,7 +209,7 @@ export const punishingSqueeze = async (handy, isConnected) => {
   try {
     await handy.hampPlay(); // Start the movement
     await handy.setStrokeZone({ min: 0, max: 10 }); // Very small, tight movements at the base
-    await handy.setHampVelocity(80); // Faster speed for a punishing squeeze
+    await handy.setHampVelocity(30); // Faster speed for a punishing squeeze
     console.log('PunishingSqueeze action triggered: Tight grip at the base.');
   } catch (error) {
     console.error('Error during punishingSqueeze:', error);
