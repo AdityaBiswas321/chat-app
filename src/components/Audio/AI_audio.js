@@ -148,49 +148,56 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
     });
   };
 
-  const speakResponse = (response) => {
-    if ('speechSynthesis' in window && isInSessionRef.current) {
-      stopListening();
-      window.speechSynthesis.cancel();
+const speakResponse = (response) => {
+  if ('speechSynthesis' in window && isInSessionRef.current) {
+    stopListening();
+    window.speechSynthesis.cancel();
 
-      const sentences = response.split('. ').map(sentence => sentence.trim()).filter(Boolean);
-      let sentenceIndex = 0;
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Female'));
 
-      const speakNextSentence = () => {
-        if (sentenceIndex < sentences.length) {
-          const sentence = sentences[sentenceIndex];
-          detectCommand(sentence);
+    const sentences = response.split('. ').map(sentence => sentence.trim()).filter(Boolean);
+    let sentenceIndex = 0;
 
-          const utterance = new SpeechSynthesisUtterance(sentence);
-          console.log("Speaking sentence:", sentence);
+    const speakNextSentence = () => {
+      if (sentenceIndex < sentences.length) {
+        const sentence = sentences[sentenceIndex];
+        detectCommand(sentence);
 
-          utterance.onend = () => {
-            console.log("Finished speaking sentence:", sentence);
-            sentenceIndex += 1;
-            speakNextSentence();
-          };
-
-          utterance.onerror = (error) => {
-            console.error("Speech synthesis error:", error);
-          };
-
-          window.speechSynthesis.speak(utterance);
-        } else {
-          console.log("All sentences spoken. Checking if session is active:", isInSessionRef.current);
-          if (isInSessionRef.current) {
-            console.log("Session is active. Restarting listening...");
-            startListening();
-          } else {
-            console.log("Session is inactive. Not restarting listening.");
-          }
+        const utterance = new SpeechSynthesisUtterance(sentence);
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
         }
-      };
+        console.log("Speaking sentence:", sentence);
 
-      speakNextSentence();
-    } else {
-      console.error("SpeechSynthesis not supported in this browser.");
-    }
-  };
+        utterance.onend = () => {
+          console.log("Finished speaking sentence:", sentence);
+          sentenceIndex += 1;
+          speakNextSentence();
+        };
+
+        utterance.onerror = (error) => {
+          console.error("Speech synthesis error:", error);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        console.log("All sentences spoken. Checking if session is active:", isInSessionRef.current);
+        if (isInSessionRef.current) {
+          console.log("Session is active. Restarting listening...");
+          startListening();
+        } else {
+          console.log("Session is inactive. Not restarting listening.");
+        }
+      }
+    };
+
+    speakNextSentence();
+  } else {
+    console.error("SpeechSynthesis not supported in this browser.");
+  }
+};
+
 
   const handleAudioInput = async (audioText) => {
     if (!apiKey) {

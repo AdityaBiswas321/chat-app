@@ -51,7 +51,7 @@ function HandsFreeChatApp() {
       {isModalOpen && (
         <div className="modal-overlay" onClick={toggleModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>How to Use the Hands-Free LLM Chat</h2>
+            <h2>How to Use the Hands-Free LLM Chat - **Chrome Browser Only**</h2>
             <p>Instructions for hands-free interaction:</p>
             <ul>
               <li>Click the "Listen" button to start listening for your voice commands.</li>

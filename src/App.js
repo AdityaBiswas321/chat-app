@@ -1,9 +1,10 @@
-// Main App.js
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from "react-router-dom";
 import ChatPage from "./pages/ChatPage"; // Main chat component
-import VideoScriptPlayer from "./pages/VideoScriptPlayer.js"; // Small app component
-import AudioInteract from './pages/AudioInteract'; // Import the new AudioInteract page
+import VideoScriptPlayer from "./pages/VideoScriptPlayer"; // Small app component
+import AudioInteract from "./pages/AudioInteract"; // Hands-free interaction page
+import UncensoredChatPage from "./pages/Uncensoredchatpage"; // New Uncensored chat page
+import CharacterImport from "./pages/CharacterImport"; // New Uncensored chat page
 
 import "./App.css";
 
@@ -25,7 +26,7 @@ function MainApp() {
       clearTimeout(clickTimer); // Reset the timer if clicked within the time frame
     }
 
-    setClickCount(prevCount => {
+    setClickCount((prevCount) => {
       const newCount = prevCount + 1;
       if (newCount === 3) {
         navigate("/video-script"); // Redirect after 3 clicks within time frame
@@ -35,9 +36,11 @@ function MainApp() {
     });
 
     // Set a 5-second timer to reset click count if there are no clicks within this period
-    setClickTimer(setTimeout(() => {
-      setClickCount(0);
-    }, 5000));
+    setClickTimer(
+      setTimeout(() => {
+        setClickCount(0);
+      }, 5000)
+    );
   };
 
   useEffect(() => {
@@ -50,8 +53,9 @@ function MainApp() {
       <nav>
         <ul>
           <li><Link to="/" onClick={handleChatClick}>Chat with Handy-LLM</Link></li>
-          {/* The VideoScriptPlayer link is hidden from the UI */}
-          <li><Link to="/audio-interact">Hands-Free Audio Interaction</Link></li> {/* New link for AudioInteract */}
+          <li><Link to="/audio-interact">Hands-Free Audio LLM</Link></li>
+          <li><Link to="/character-import">Character Import</Link></li> {/* Correct label */}
+          <li><Link to="/uncensored-chat">Uncensored Chat</Link></li> {/* New link for Uncensored Chat */}
         </ul>
       </nav>
 
@@ -59,7 +63,9 @@ function MainApp() {
       <Routes>
         <Route path="/" element={<ChatPage />} />
         <Route path="/video-script" element={<VideoScriptPlayer />} />
-        <Route path="/audio-interact" element={<AudioInteract />} /> {/* New route for AudioInteract */}
+        <Route path="/audio-interact" element={<AudioInteract />} />
+        <Route path="/uncensored-chat" element={<UncensoredChatPage />} /> {/* New route for Uncensored Chat */}
+        <Route path="/character-import" element={<CharacterImport />} />
       </Routes>
     </div>
   );
