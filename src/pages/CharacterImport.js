@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../App.css";
+// import "../App.css";
 
 function CharacterImport() {
   const [apiKey, setApiKey] = useState(""); // State for storing the API key

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AI_Audio from "../components/Audio/AI_audio";
 import HandyController from "../components/Chat/Hardcode";
-import "../App.css"; // Import App.css for styling
+// import "../App.css"; // Import App.css for styling
 
 function HandsFreeChatApp() {
   const [selectedCategory, setSelectedCategory] = useState(""); // Command keyword for HandyController

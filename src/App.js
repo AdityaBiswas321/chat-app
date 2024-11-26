@@ -5,8 +5,13 @@ import VideoScriptPlayer from "./pages/VideoScriptPlayer"; // Small app componen
 import AudioInteract from "./pages/AudioInteract"; // Hands-free interaction page
 import UncensoredChatPage from "./pages/Uncensoredchatpage"; // New Uncensored chat page
 import CharacterImport from "./pages/CharacterImport"; // New Uncensored chat page
+import FunctionEditor from "./pages/FunctionEditor"; // Function editor page
 
-import "./App.css";
+import "./CSS/App.css";
+
+
+
+
 
 function App() {
   return (
@@ -19,6 +24,7 @@ function App() {
 function MainApp() {
   const [clickCount, setClickCount] = useState(0);
   const [clickTimer, setClickTimer] = useState(null);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const navigate = useNavigate();
 
   const handleChatClick = () => {
@@ -47,26 +53,50 @@ function MainApp() {
     return () => clearTimeout(clickTimer); // Cleanup timer on component unmount
   }, [clickTimer]);
 
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
+  };
+
+
   return (
     <div className="App">
       {/* Navigation Bar */}
       <nav>
-        <ul>
+        <ul className="navbar">
           <li><Link to="/" onClick={handleChatClick}>Chat with Handy-LLM</Link></li>
           <li><Link to="/audio-interact">Hands-Free Audio LLM</Link></li>
-          <li><Link to="/character-import">Character Import</Link></li> {/* Correct label */}
-          <li><Link to="/uncensored-chat">Uncensored Chat</Link></li> {/* New link for Uncensored Chat */}
+          <li><Link to="/character-import">Character Import</Link></li>
+          <li><Link to="/uncensored-chat">Uncensored Chat</Link></li>
+
+          {/* Settings Dropdown */}
+          <li className="settings-dropdown">
+            <div
+              className="settings-icon"
+              title="Settings"
+              onClick={toggleDropdown}
+            >
+              ⚙️
+            </div>
+            {isDropdownVisible && (
+              <ul className="dropdown-menu">
+                <li><Link to="/function-editor">Edit Functions</Link></li>
+              </ul>
+            )}
+          </li>
         </ul>
       </nav>
 
       {/* Routes for each page */}
-      <Routes>
-        <Route path="/" element={<ChatPage />} />
-        <Route path="/video-script" element={<VideoScriptPlayer />} />
-        <Route path="/audio-interact" element={<AudioInteract />} />
-        <Route path="/uncensored-chat" element={<UncensoredChatPage />} /> {/* New route for Uncensored Chat */}
-        <Route path="/character-import" element={<CharacterImport />} />
-      </Routes>
+      <div className="content-container">
+        <Routes>
+            <Route path="/" element={<ChatPage />} />
+            <Route path="/video-script" element={<VideoScriptPlayer />} />
+            <Route path="/audio-interact" element={<AudioInteract />} />
+            <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
+            <Route path="/character-import" element={<CharacterImport />} />
+            <Route path="/function-editor" element={<FunctionEditor />} />
+        </Routes>
+    </div>
     </div>
   );
 }

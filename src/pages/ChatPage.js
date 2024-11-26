@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import LLMConnector from "../components/Chat/AI";
 import HandyController from "../components/Chat/Hardcode";
-import "../App.css"; // Import App.css for styling
+// import "../App.css"; // Import App.css for styling
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");

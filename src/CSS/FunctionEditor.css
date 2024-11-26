@@ -1,0 +1,179 @@
+/* Overall container for Function Editor */
+.function-editor-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 30px 40px;
+  gap: 40px;
+  color: #50c878;
+}
+
+/* Left-side Function List */
+.function-list {
+  flex: 1;
+  background-color: #1c1c1c;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  max-height: 90vh;
+  overflow-y: auto; /* Enable scrolling */
+}
+
+.function-list h2 {
+  color: #50c878;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.function-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.function-list li {
+  margin: 15px auto;
+  padding: 15px;
+  border: 1px solid #50c878;
+  border-radius: 8px;
+  background-color: #2b2b2b;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  max-width: 90%; /* Center the list */
+}
+
+/* Scrollbar Styling */
+.function-list::-webkit-scrollbar {
+  width: 12px;
+}
+
+.function-list::-webkit-scrollbar-thumb {
+  background: #50c878;
+  border-radius: 6px;
+}
+
+.function-list::-webkit-scrollbar-thumb:hover {
+  background: #48a862;
+}
+
+.function-list::-webkit-scrollbar-track {
+  background: #2b2b2b;
+}
+
+/* Right-side Function Editor */
+.function-editor {
+  flex: 1.5;
+  background-color: #1c1c1c;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.function-editor h1 {
+  text-align: center;
+  color: #50c878;
+  margin-bottom: 20px;
+}
+
+/* Dropdown Styling */
+#function-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #50c878;
+  border-radius: 4px;
+  background-color: #2b2b2b;
+  color: #50c878;
+  font-size: 1.1rem;
+  outline: none;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+#function-select:hover {
+  border-color: #48a862;
+}
+
+#function-select:focus {
+  background-color: #1c1c1c;
+  border-color: #48a862;
+  color: #fff;
+}
+
+/* Combined Min-Max Slider */
+.parameter-editor .range-slider {
+  margin: 20px 0;
+  position: relative;
+}
+
+.range-slider input[type="range"] {
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #2b2b2b;
+  border-radius: 4px;
+  outline: none;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 2px solid #50c878;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.range-slider input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.range-slider .range-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: #50c878;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+/* Parameter Editor */
+.parameter-editor label {
+  color: #50c878;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.parameter-editor button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #50c878;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  width: 100%;
+}
+
+.parameter-editor button:hover {
+  background-color: #48a862;
+  transform: scale(1.05);
+}
+
+/* Add padding above the label */
+.slider-label {
+    display: block; /* Ensure it takes up full width */
+    margin-top: 10px; /* Add padding or margin above */
+    margin-bottom: 10px; /* Space below the label */
+    font-size: 1rem; /* Ensure font size matches the theme */
+    color: #50c878; /* Match the green theme */
+  }
+  

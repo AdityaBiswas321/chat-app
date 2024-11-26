@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import LLMConnector from "../components/Uncensored/uncensored_ai.js"; // Reusing the AI component
-import "../App.css";
+// import "../App.css";
 
 function UncensoredChatPage() {
   const [apiKey, setApiKey] = useState(""); // State for storing the API key

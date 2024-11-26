@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import LLMConnectorVideo from "../components/Video/AI_Video";
 import HandyVideoSync from "../components/Video/HandyVideoSync"; // The new HandyController component
-import "../App.css"; // All styling is in App.css
+// import "../App.css"; // All styling is in App.css
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
