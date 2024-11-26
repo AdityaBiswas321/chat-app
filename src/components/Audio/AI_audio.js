@@ -1,32 +1,40 @@
-// AI_Audio.js
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import CharacterManager from '../Character/CharacterManager';
-import { DEFAULT_CHARACTERS } from '../Character/CharacterPrompts';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useAppContext } from "../../context/AppContext";
+import CharacterManager from "../Character/CharacterManager";
 
 const AI_Audio = ({ onCategorySelect = () => {} }) => {
-  const [apiKey, setApiKey] = useState('');
-  const [characters, setCharacters] = useState(DEFAULT_CHARACTERS);
-  const [selectedCharacter, setSelectedCharacter] = useState('mistress');
+  const {
+    apiKey,
+    setApiKey,
+    characters,
+    selectedCharacter,
+    setSelectedCharacter,
+    addToConversationHistory,
+    resetConversation,
+    removeLastInteraction,
+  } = useAppContext();
+
   const [isListening, setIsListening] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const recognitionRef = useRef(null);
   const isInSessionRef = useRef(false);
   const isRecognitionActiveRef = useRef(false);
-  
-  // Use ref for persistent conversation history across renders
-  const conversationRef = useRef({
-    characterbuilder: [],
-    mistress: [],
-    teacher: [],
-    therapist: [],
-  });
+  const conversationRef = useRef({}); // Persistent storage for conversation history
+
+  // Initialize conversationRef with default structure
+  useEffect(() => {
+    if (!conversationRef.current[selectedCharacter]) {
+      conversationRef.current[selectedCharacter] = [];
+    }
+  }, [selectedCharacter]);
 
   useEffect(() => {
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
+      recognition.lang = "en-US";
       recognition.continuous = false;
       recognition.interimResults = false;
       recognitionRef.current = recognition;
@@ -34,36 +42,6 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
       console.error("Speech Recognition not supported in this browser.");
     }
   }, []);
-
-  const handleApiKeyChange = (e) => setApiKey(e.target.value);
-
-  const handleCharacterChange = (characterKey) => {
-    setSelectedCharacter(characterKey);
-  };
-
-  const handleAddNewCharacter = (newCharacter) => {
-    setCharacters({
-      ...characters,
-      [newCharacter.name.toLowerCase()]: newCharacter,
-    });
-    conversationRef.current[newCharacter.name.toLowerCase()] = [];
-    setSelectedCharacter(newCharacter.name.toLowerCase());
-  };
-
-  const handleUpdateCharacter = (characterKey, updatedCharacter) => {
-    setCharacters({
-      ...characters,
-      [characterKey]: updatedCharacter,
-    });
-  };
-
-  const handleDeleteCharacter = (characterKey) => {
-    const updatedCharacters = { ...characters };
-    delete updatedCharacters[characterKey];
-    delete conversationRef.current[characterKey];
-    setCharacters(updatedCharacters);
-    setSelectedCharacter('mistress');
-  };
 
   const startInteraction = () => {
     console.log("Starting interaction...");
@@ -77,13 +55,17 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
     isInSessionRef.current = false;
     setIsListening(false);
     stopListening();
-    if ('speechSynthesis' in window) {
+    if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
   };
 
   const startListening = () => {
-    if (recognitionRef.current && isInSessionRef.current && !isRecognitionActiveRef.current) {
+    if (
+      recognitionRef.current &&
+      isInSessionRef.current &&
+      !isRecognitionActiveRef.current
+    ) {
       console.log("Starting to listen...");
       isRecognitionActiveRef.current = true;
       setIsListening(true);
@@ -122,22 +104,22 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
   const detectCommand = (responseText) => {
     const lowerCaseResponse = responseText.toLowerCase();
     const commandMappings = {
-      'gentlepat()': 'gentlePat',
-      'gentlestroke()': 'gentleStroke',
-      'firmgrip()': 'firmGrip',
-      'deny()': 'deny',
-      'stop()': 'stop',
-      'rapidheadstroke()': 'rapidHeadStroke',
-      'mouthcommand()': 'mouthCommand',
-      'threateninggrip()': 'threateningGrip',
-      'ultimatedrain()': 'ultimateDrain',
-      'soothingtouch()': 'soothingTouch',
-      'punishpulse()': 'punishPulse',
-      'slowagonystroke()': 'slowAgonyStroke',
-      'basegrip()': 'baseGrip',
-      'initialseizure()': 'initialSeizure',
-      'relentlessstroke()': 'relentlessStroke',
-      'punishingsqueeze()': 'punishingSqueeze'
+      "gentlepat()": "gentlePat",
+      "gentlestroke()": "gentleStroke",
+      "firmgrip()": "firmGrip",
+      "deny()": "deny",
+      "stop()": "stop",
+      "rapidheadstroke()": "rapidHeadStroke",
+      "mouthcommand()": "mouthCommand",
+      "threateninggrip()": "threateningGrip",
+      "ultimatedrain()": "ultimateDrain",
+      "soothingtouch()": "soothingTouch",
+      "punishpulse()": "punishPulse",
+      "slowagonystroke()": "slowAgonyStroke",
+      "basegrip()": "baseGrip",
+      "initialseizure()": "initialSeizure",
+      "relentlessstroke()": "relentlessStroke",
+      "punishingsqueeze()": "punishingSqueeze",
     };
 
     Object.entries(commandMappings).forEach(([trigger, command]) => {
@@ -148,56 +130,63 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
     });
   };
 
-const speakResponse = (response) => {
-  if ('speechSynthesis' in window && isInSessionRef.current) {
-    stopListening();
-    window.speechSynthesis.cancel();
+  const speakResponse = (response) => {
+    if ("speechSynthesis" in window && isInSessionRef.current) {
+      stopListening();
+      window.speechSynthesis.cancel();
 
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(voice => voice.lang === 'en-US' && voice.name.includes('Female'));
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(
+        (voice) => voice.lang === "en-US" && voice.name.includes("Female")
+      );
 
-    const sentences = response.split('. ').map(sentence => sentence.trim()).filter(Boolean);
-    let sentenceIndex = 0;
+      const sentences = response
+        .split(". ")
+        .map((sentence) => sentence.trim())
+        .filter(Boolean);
+      let sentenceIndex = 0;
 
-    const speakNextSentence = () => {
-      if (sentenceIndex < sentences.length) {
-        const sentence = sentences[sentenceIndex];
-        detectCommand(sentence);
+      const speakNextSentence = () => {
+        if (sentenceIndex < sentences.length) {
+          const sentence = sentences[sentenceIndex];
+          detectCommand(sentence);
 
-        const utterance = new SpeechSynthesisUtterance(sentence);
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
-        }
-        console.log("Speaking sentence:", sentence);
+          const utterance = new SpeechSynthesisUtterance(sentence);
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+          console.log("Speaking sentence:", sentence);
 
-        utterance.onend = () => {
-          console.log("Finished speaking sentence:", sentence);
-          sentenceIndex += 1;
-          speakNextSentence();
-        };
+          utterance.onend = () => {
+            console.log("Finished speaking sentence:", sentence);
+            sentenceIndex += 1;
+            speakNextSentence();
+          };
 
-        utterance.onerror = (error) => {
-          console.error("Speech synthesis error:", error);
-        };
+          utterance.onerror = (error) => {
+            console.error("Speech synthesis error:", error);
+          };
 
-        window.speechSynthesis.speak(utterance);
-      } else {
-        console.log("All sentences spoken. Checking if session is active:", isInSessionRef.current);
-        if (isInSessionRef.current) {
-          console.log("Session is active. Restarting listening...");
-          startListening();
+          window.speechSynthesis.speak(utterance);
         } else {
-          console.log("Session is inactive. Not restarting listening.");
+          console.log(
+            "All sentences spoken. Checking if session is active:",
+            isInSessionRef.current
+          );
+          if (isInSessionRef.current) {
+            console.log("Session is active. Restarting listening...");
+            startListening();
+          } else {
+            console.log("Session is inactive. Not restarting listening.");
+          }
         }
-      }
-    };
+      };
 
-    speakNextSentence();
-  } else {
-    console.error("SpeechSynthesis not supported in this browser.");
-  }
-};
-
+      speakNextSentence();
+    } else {
+      console.error("SpeechSynthesis not supported in this browser.");
+    }
+  };
 
   const handleAudioInput = async (audioText) => {
     if (!apiKey) {
@@ -208,12 +197,12 @@ const speakResponse = (response) => {
     setIsLoading(true);
 
     const character = characters[selectedCharacter];
-    const systemMessage = `${character.prompt}\n${character.commands || ''}`;
+    const systemMessage = `${character.prompt}\n${character.commands || ""}`;
 
     const updatedConversationHistory = [
-      { role: 'system', content: systemMessage },
-      ...conversationRef.current[selectedCharacter],
-      { role: 'user', content: audioText }
+      { role: "system", content: systemMessage },
+      ...(conversationRef.current[selectedCharacter] || []),
+      { role: "user", content: audioText },
     ];
 
     const payload = {
@@ -222,40 +211,42 @@ const speakResponse = (response) => {
     };
 
     try {
-      const result = await axios.post('https://api.openai.com/v1/chat/completions', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-      });
+      const result = await axios.post(
+        "https://api.openai.com/v1/chat/completions",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+        }
+      );
 
-      if (result.data && result.data.choices && result.data.choices.length > 0) {
+      if (
+        result.data &&
+        result.data.choices &&
+        result.data.choices.length > 0
+      ) {
         const apiResponse = result.data.choices[0].message.content;
         speakResponse(apiResponse);
 
+        // Update conversation history
         conversationRef.current[selectedCharacter] = [
-          ...conversationRef.current[selectedCharacter],
-          { role: 'user', content: audioText },
-          { role: 'assistant', content: apiResponse }
+          ...updatedConversationHistory,
+          { role: "assistant", content: apiResponse },
         ];
+
+        addToConversationHistory(selectedCharacter, {
+          role: "assistant",
+          content: apiResponse,
+        });
       } else {
-        console.error('No response from OpenAI API.');
+        console.error("No response from OpenAI API.");
       }
     } catch (error) {
-      console.error('Error calling OpenAI API:', error);
+      console.error("Error calling OpenAI API:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const resetConversation = () => {
-    conversationRef.current[selectedCharacter] = [];
-  };
-
-  const removeLastInteraction = () => {
-    const history = conversationRef.current[selectedCharacter];
-    if (history?.length >= 2) {
-      conversationRef.current[selectedCharacter] = history.slice(0, -2);
     }
   };
 
@@ -267,27 +258,24 @@ const speakResponse = (response) => {
           type="text"
           placeholder="Enter API Key"
           value={apiKey}
-          onChange={handleApiKeyChange}
+          onChange={(e) => setApiKey(e.target.value)}
         />
       </div>
 
       {isLoading && <p>Loading...</p>}
 
       <div className="conversation-log">
-        {conversationRef.current[selectedCharacter]?.map((entry, index) => (
-          <p key={index}>
-            <strong>{entry.role === 'user' ? 'User' : 'AI'}:</strong> {entry.content}
-          </p>
-        ))}
+        {conversationRef.current[selectedCharacter]
+          ?.filter((entry) => entry.role !== "system") // Exclude system messages
+          .map((entry, index) => (
+            <p key={index}>
+              <strong>{entry.role === "user" ? "User" : "AI"}:</strong>{" "}
+              {entry.content}
+            </p>
+          ))}
       </div>
 
-      <CharacterManager
-        onCharacterChange={handleCharacterChange}
-        onAddNewCharacter={handleAddNewCharacter}
-        onUpdateCharacter={handleUpdateCharacter}
-        onDeleteCharacter={handleDeleteCharacter}
-        characters={characters}
-      />
+      <CharacterManager />
 
       {isInSessionRef.current ? (
         <button onClick={endInteraction}>End Interaction</button>
@@ -295,8 +283,17 @@ const speakResponse = (response) => {
         <button onClick={startInteraction}>Start Interaction</button>
       )}
 
-      <button onClick={resetConversation}>Reset Conversation</button>
-      <button onClick={removeLastInteraction}>Remove Last Interaction</button>
+      <button
+        onClick={() => {
+          resetConversation(selectedCharacter);
+          conversationRef.current[selectedCharacter] = [];
+        }}
+      >
+        Reset Conversation
+      </button>
+      <button onClick={() => removeLastInteraction(selectedCharacter)}>
+        Remove Last Interaction
+      </button>
 
       {isListening && <p>Listening...</p>}
     </div>

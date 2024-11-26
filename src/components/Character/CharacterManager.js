@@ -1,29 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { DEFAULT_CHARACTERS, createCustomCharacter } from './CharacterPrompts';
-import styles from '../Chat/ChatAppComponents.module.css';
+import React, { useState, useEffect } from "react";
+import { useAppContext } from "../../context/AppContext"; // Import context
+import styles from "../Chat/ChatAppComponents.module.css";
+import { HANDY_COMMANDS } from "../Character/CharacterPrompts"; // Import default commands
 
-const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, onDeleteCharacter, onUpdateCharacter }) => {
-  const [selectedCharacter, setSelectedCharacter] = useState('mistress');
-  const [newCharacterName, setNewCharacterName] = useState('');
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [customCommands, setCustomCommands] = useState('');
+const CharacterManager = () => {
+  const {
+    characters,
+    selectedCharacter,
+    setSelectedCharacter,
+    addCharacter,
+    updateCharacter,
+    deleteCharacter,
+  } = useAppContext(); // Use context
+
+  const [newCharacterName, setNewCharacterName] = useState("");
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [customCommands, setCustomCommands] = useState("");
   const [isEditing, setIsEditing] = useState(true);
 
-  // Update fields when a character is selected, unless we're adding a new character
+  // Update fields when a character is selected
   useEffect(() => {
     if (isEditing) {
       const selected = characters[selectedCharacter] || {};
-      setCustomPrompt(selected.prompt || '');
-      setCustomCommands(selected.commands || '');
-      setNewCharacterName(selected.name || '');
+      setCustomPrompt(selected.prompt || "");
+      setCustomCommands(selected.commands || "");
+      setNewCharacterName(selected.name || "");
     }
   }, [selectedCharacter, characters, isEditing]);
 
-  // Handle selecting a character
   const handleCharacterSelect = (e) => {
-    setSelectedCharacter(e.target.value);
-    setIsEditing(true); // Switch back to editing mode when selecting an existing character
-    onCharacterChange(e.target.value);
+    setSelectedCharacter(e.target.value); // Update context state
+    setIsEditing(true); // Reset to edit mode
   };
 
   const handleNewCharacterNameChange = (e) => {
@@ -46,79 +53,82 @@ const CharacterManager = ({ onCharacterChange, onAddNewCharacter, characters, on
         prompt: customPrompt,
         commands: customCommands,
       };
-      onUpdateCharacter(selectedCharacter, updatedCharacter);
+      updateCharacter(selectedCharacter, updatedCharacter);
     } else {
       // Add new character
-      const newCharacter = createCustomCharacter(newCharacterName, customPrompt, customCommands);
-      onAddNewCharacter(newCharacter);
+      const newCharacter = {
+        name: newCharacterName,
+        prompt: customPrompt,
+        commands: customCommands,
+      };
+      addCharacter(newCharacter);
       setSelectedCharacter(newCharacterName); // Set the newly added character as selected
       setIsEditing(true); // Switch to edit mode after adding the character
     }
   };
 
   const handleDeleteCharacter = () => {
-    if (selectedCharacter in DEFAULT_CHARACTERS) {
+    if (selectedCharacter === "mistress") {
       alert("Default characters can't be deleted.");
       return;
     }
-    onDeleteCharacter(selectedCharacter);
-    setSelectedCharacter('mistress'); // Reset to default character after deletion
-    onCharacterChange('mistress');
+    deleteCharacter(selectedCharacter);
+    setSelectedCharacter("mistress"); // Reset to default character after deletion
   };
 
   const handleSwitchToAddMode = () => {
     // Clear fields and switch to Add Mode
-    setNewCharacterName('');
-    setCustomPrompt('');
+    setNewCharacterName("");
+    setCustomPrompt("");
+    setCustomCommands(HANDY_COMMANDS); // Prepopulate with default commands
     setIsEditing(false); // Switch to Add Mode
   };
 
   return (
     <div className={styles["character-manager"]}>
-    <h3>Select Character:</h3>
-    <select value={selectedCharacter} onChange={handleCharacterSelect}>
-      {Object.keys(characters).map((key) => (
-        <option key={key} value={key}>
-          {characters[key].name}
-        </option>
-      ))}
-    </select>
+      <h3>Select Character:</h3>
+      <select value={selectedCharacter} onChange={handleCharacterSelect}>
+        {Object.keys(characters).map((key) => (
+          <option key={key} value={key}>
+            {characters[key].name}
+          </option>
+        ))}
+      </select>
 
-    <h3>{isEditing ? `Edit Character: ${newCharacterName}` : 'Add New Character'}</h3>
-    <input
-      type="text"
-      placeholder="Character Name"
-      value={newCharacterName}
-      onChange={handleNewCharacterNameChange}
-      disabled={isEditing}
-    />
-    <textarea
-      placeholder="Custom Prompt"
-      value={customPrompt}
-      onChange={handleCustomPromptChange}
-      rows="4"
-    />
-    <textarea
-      placeholder="Custom Commands"
-      value={customCommands}
-      onChange={handleCustomCommandsChange}
-      rows="4"
-    />
-    <button onClick={handleAddOrUpdateCharacter}>
-      {isEditing ? 'Update Character' : 'Add Character'}
-    </button>
-    <button onClick={handleSwitchToAddMode}>
-      Add New Character
-    </button>
+      <h3>{isEditing ? `Edit Character: ${newCharacterName}` : "Add New Character"}</h3>
+      <input
+        type="text"
+        placeholder="Character Name"
+        value={newCharacterName}
+        onChange={handleNewCharacterNameChange}
+        disabled={isEditing}
+      />
+      <textarea
+        placeholder="Custom Prompt"
+        value={customPrompt}
+        onChange={handleCustomPromptChange}
+        rows="4"
+      />
+      <textarea
+        placeholder="Custom Commands"
+        value={customCommands}
+        onChange={handleCustomCommandsChange}
+        rows="4"
+      />
+      <button onClick={handleAddOrUpdateCharacter}>
+        {isEditing ? "Update Character" : "Add Character"}
+      </button>
+      <button onClick={handleSwitchToAddMode}>Add New Character</button>
 
-    {isEditing && (
-      <div>
-        <h3>Delete Character</h3>
-        <button onClick={handleDeleteCharacter}>Delete {characters[selectedCharacter]?.name}</button>
-      </div>
-    )}
-  </div>
-  
+      {isEditing && (
+        <div>
+          <h3>Delete Character</h3>
+          <button onClick={handleDeleteCharacter}>
+            Delete {characters[selectedCharacter]?.name}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 
