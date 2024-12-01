@@ -1,10 +1,12 @@
 
 ## License
+
 This project is licensed under the GNU Affero General Public License v3 (AGPLv3).
 See the [LICENSE](./LICENSE) file for details.
 
 ## Contributing
-Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) and sign the [Contributor License Agreement (CLA)](CLA.md) before submitting a pull request
+
+Contributions are welcome! Please note you will be asked to sign the [Contributor License Agreement (CLA)](CLA.md) the first time you submit a pull request. To sign, simply post a comment in the pull request thread when CLA Assistant asks you to.
 
 
 
