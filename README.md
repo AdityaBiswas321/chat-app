@@ -1,3 +1,13 @@
+
+## License
+This project is licensed under the GNU Affero General Public License v3 (AGPLv3).
+See the [LICENSE](./LICENSE) file for details.
+
+## Contributing
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) and sign the [Contributor License Agreement (CLA)](CLA.md) before submitting a pull request
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
