@@ -247,48 +247,53 @@ const FunctionEditor = () => {
         </select>
 
         {selectedFunction && (
-          <div className="parameter-editor">
-            <h2>Edit Parameters for {selectedFunction}</h2>
-            <div className="range-slider">
-              <label className="slider-label">Min - Max</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={parameters.min}
-                name="min"
-                onChange={handleParameterChange}
-              />
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={parameters.max}
-                name="max"
-                onChange={handleParameterChange}
-              />
-              <div
-                className="range-track"
-                style={{
-                  left: `${parameters.min}%`,
-                  right: `${100 - parameters.max}%`,
-                }}
-              />
-            </div>
-            <div>
-              <label>Velocity</label>
-              <input
-                type="range"
-                min="0"
-                max="50"
-                value={parameters.velocity}
-                name="velocity"
-                onChange={handleParameterChange}
-              />
-            </div>
-            <button onClick={handleUpdateFunction}>Update Function</button>
-          </div>
-        )}
+  <div className="parameter-editor">
+    <h2>Edit Parameters for {selectedFunction}</h2>
+    <div className="range-slider">
+      <label className="slider-label">
+        Min - Max: {parameters.min} - {parameters.max}
+      </label>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={parameters.min}
+        name="min"
+        onChange={handleParameterChange}
+      />
+      <input
+        type="range"
+        min="0"
+        max="100"
+        value={parameters.max}
+        name="max"
+        onChange={handleParameterChange}
+      />
+      <div
+        className="range-track"
+        style={{
+          left: `${parameters.min}%`,
+          right: `${100 - parameters.max}%`,
+        }}
+      />
+    </div>
+    <div>
+      <label>
+        Velocity: {parameters.velocity}
+      </label>
+      <input
+        type="range"
+        min="0"
+        max="50"
+        value={parameters.velocity}
+        name="velocity"
+        onChange={handleParameterChange}
+      />
+    </div>
+    <button onClick={handleUpdateFunction}>Update Function</button>
+  </div>
+)}
+
       </div>
     </div>
   );

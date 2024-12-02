@@ -8,6 +8,7 @@
   color: #50c878;
 }
 
+
 /* Left-side Function List */
 .function-list {
   flex: 1;
@@ -41,6 +42,33 @@
   flex-direction: column;
   text-align: left;
   max-width: 90%; /* Center the list */
+}
+
+.function-list li button {
+  margin-top: 10px; /* Add spacing above buttons */
+  padding: 10px 20px; /* Adjust padding for consistent size */
+  background-color: #50c878; /* Teal button background */
+  color: #ffffff; /* White text for contrast */
+  border: none; /* Remove default border */
+  border-radius: 4px; /* Add rounded corners */
+  cursor: pointer; /* Show pointer on hover */
+  font-size: 1rem; /* Ensure font size matches theme */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Add hover effect transitions */
+}
+
+/* Add spacing specifically between Test and Stop buttons */
+.function-list li button + button {
+  margin-top: 10px; /* Space between Test and Stop buttons */
+}
+
+.function-list li button:hover {
+  background-color: #50c878; /* Slightly darker teal on hover */
+  transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+.function-list li button:active {
+  background-color: #3B8D80; /* Even darker teal for active state */
+  transform: scale(0.95); /* Slight press-down effect */
 }
 
 /* Scrollbar Styling */
@@ -177,3 +205,78 @@
     color: #50c878; /* Match the green theme */
   }
   
+/* Mobile-Specific Styles */
+@media (max-width: 768px) {
+  .function-editor-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 20px;
+    align-items: center;
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevent overall scrolling */
+  }
+
+  .function-list {
+    width: 90%;
+    height: 45%; /* Adjust height to share viewport */
+    overflow-y: auto; /* Enable scrolling for long lists */
+    margin-bottom: 10px;
+  }
+
+  .function-editor {
+    width: 90%;
+    height: 50%; /* Use the remaining viewport space */
+    overflow-y: auto; /* Allow scrolling if necessary */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .connection-management {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .connection-management input,
+  .connection-management button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .connection-status {
+    text-align: center;
+  }
+
+  #function-select {
+    width: 100%;
+    max-width: 300px;
+    margin-top: 15px;
+  }
+
+  .parameter-editor {
+    margin-top: 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .parameter-editor .range-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .range-slider input[type="range"] {
+    width: 100%;
+  }
+
+  .parameter-editor button {
+    width: 100%;
+    margin-top: 20px;
+  }
+}

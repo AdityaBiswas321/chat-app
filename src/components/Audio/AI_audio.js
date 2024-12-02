@@ -137,7 +137,23 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
 
       const voices = window.speechSynthesis.getVoices();
       const preferredVoice = voices.find(
-        (voice) => voice.lang === "en-US" && voice.name.includes("Female")
+        (voice) => voice.lang === "en-GB" && voice.name === "Google UK English Female"
+      );
+      
+      // Fallback to any available female voice if the preferred voice isn't found
+      const fallbackVoice = !preferredVoice
+        ? voices.find((voice) => voice.name.toLowerCase().includes("female"))
+        : null;
+      
+      if (!preferredVoice && !fallbackVoice) {
+        console.warn("No female voice found. Falling back to default voice.");
+      }
+      
+      // Use the preferred voice if available, otherwise fallback
+      const selectedVoice = preferredVoice || fallbackVoice || voices[0];
+      
+      console.log(
+        `Using voice: ${selectedVoice.name} (${selectedVoice.lang})`
       );
 
       const sentences = response

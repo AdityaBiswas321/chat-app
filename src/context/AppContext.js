@@ -20,7 +20,7 @@ const DEFAULT_FUNCTION_PARAMETERS = {
   initialSeizure: { min: 10, max: 40, velocity: 10 },
   relentlessStroke: { min: 5, max: 60, velocity: 20 },
   punishingSqueeze: { min: 0, max: 10, velocity: 30 },
-  deny: { min: 100, max: 100},
+  deny: { min: 100, max: 100 }, // Ensure this exists
 };
 
 // Provider Component

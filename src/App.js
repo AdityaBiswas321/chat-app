@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Link, useNavigate } from "react-router-dom";
-import ChatPage from "./pages/ChatPage"; // Main chat component
-import VideoScriptPlayer from "./pages/VideoScriptPlayer"; // Small app component
-import AudioInteract from "./pages/AudioInteract"; // Hands-free interaction page
-import UncensoredChatPage from "./pages/Uncensoredchatpage"; // New Uncensored chat page
-import CharacterImport from "./pages/CharacterImport"; // New Uncensored chat page
-import FunctionEditor from "./pages/FunctionEditor"; // Function editor page
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Link,
+  useNavigate,
+} from "react-router-dom";
+import ChatPage from "./pages/ChatPage";
+import VideoScriptPlayer from "./pages/VideoScriptPlayer";
+import AudioInteract from "./pages/AudioInteract";
+import UncensoredChatPage from "./pages/Uncensoredchatpage";
+import CharacterImport from "./pages/CharacterImport";
+import FunctionEditor from "./pages/FunctionEditor";
 
 import "./CSS/App.css";
-
-
-
-
+import "./CSS/navbar.css";
 
 function App() {
   return (
@@ -25,23 +28,24 @@ function MainApp() {
   const [clickCount, setClickCount] = useState(0);
   const [clickTimer, setClickTimer] = useState(null);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Handle "Chat with Handy-LLM" triple click logic
   const handleChatClick = () => {
     if (clickTimer) {
-      clearTimeout(clickTimer); // Reset the timer if clicked within the time frame
+      clearTimeout(clickTimer);
     }
 
     setClickCount((prevCount) => {
       const newCount = prevCount + 1;
       if (newCount === 3) {
-        navigate("/video-script"); // Redirect after 3 clicks within time frame
-        setClickCount(0); // Reset click count after redirection
+        navigate("/video-script");
+        setClickCount(0);
       }
       return newCount;
     });
 
-    // Set a 5-second timer to reset click count if there are no clicks within this period
     setClickTimer(
       setTimeout(() => {
         setClickCount(0);
@@ -50,53 +54,85 @@ function MainApp() {
   };
 
   useEffect(() => {
-    return () => clearTimeout(clickTimer); // Cleanup timer on component unmount
+    return () => clearTimeout(clickTimer);
   }, [clickTimer]);
 
   const toggleDropdown = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    setIsMenuOpen(false); // Close the menu when a link is clicked
+  };
 
   return (
     <div className="App">
       {/* Navigation Bar */}
       <nav>
-        <ul className="navbar">
-          <li><Link to="/" onClick={handleChatClick}>Chat with Handy-LLM</Link></li>
-          <li><Link to="/audio-interact">Hands-Free Audio LLM</Link></li>
-          <li><Link to="/character-import">Character Import</Link></li>
-          <li><Link to="/uncensored-chat">Uncensored Chat</Link></li>
+        {/* Hamburger Menu */}
+        <div className="hamburger" onClick={toggleMenu}>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
 
-          {/* Settings Dropdown */}
-          <li className="settings-dropdown">
-            <div
-              className="settings-icon"
-              title="Settings"
-              onClick={toggleDropdown}
-            >
-              ⚙️
-            </div>
-            {isDropdownVisible && (
-              <ul className="dropdown-menu">
-                <li><Link to="/function-editor">Edit Functions</Link></li>
-              </ul>
-            )}
+        {/* Navigation Links */}
+        <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
+          <li>
+            <Link to="/" onClick={() => { handleChatClick(); closeMenu(); }}>
+              Chat with Handy-LLM
+            </Link>
+          </li>
+          <li>
+            <Link to="/audio-interact" onClick={closeMenu}>
+              Hands-Free Audio LLM
+            </Link>
+          </li>
+          <li>
+            <Link to="/character-import" onClick={closeMenu}>
+              Character Import
+            </Link>
+          </li>
+          <li>
+            <Link to="/uncensored-chat" onClick={closeMenu}>
+              Uncensored Chat
+            </Link>
           </li>
         </ul>
+
+        {/* Settings Dropdown */}
+        <div
+          className={`settings-dropdown ${isDropdownVisible ? "open" : ""}`}
+          onClick={toggleDropdown}
+        >
+          <div className="settings-icon" title="Settings">
+            ⚙️
+          </div>
+          <ul className="dropdown-menu">
+            <li>
+              <Link to="/function-editor" onClick={closeMenu}>
+                Edit Functions
+              </Link>
+            </li>
+          </ul>
+        </div>
       </nav>
 
       {/* Routes for each page */}
       <div className="content-container">
         <Routes>
-            <Route path="/" element={<ChatPage />} />
-            <Route path="/video-script" element={<VideoScriptPlayer />} />
-            <Route path="/audio-interact" element={<AudioInteract />} />
-            <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
-            <Route path="/character-import" element={<CharacterImport />} />
-            <Route path="/function-editor" element={<FunctionEditor />} />
+          <Route path="/" element={<ChatPage />} />
+          <Route path="/video-script" element={<VideoScriptPlayer />} />
+          <Route path="/audio-interact" element={<AudioInteract />} />
+          <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
+          <Route path="/character-import" element={<CharacterImport />} />
+          <Route path="/function-editor" element={<FunctionEditor />} />
         </Routes>
-    </div>
+      </div>
     </div>
   );
 }

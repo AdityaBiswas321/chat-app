@@ -1,0 +1,190 @@
+/* General Navbar Styling */
+nav {
+  width: 100%;
+  background-color: #1c1c1c;
+  padding: 10px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Space between menu and settings dropdown */
+}
+
+/* Hamburger Menu Icon */
+.hamburger {
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  cursor: pointer;
+  gap: 5px;
+}
+
+.hamburger div {
+  width: 25px;
+  height: 3px;
+  background-color: #50c878;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* Navbar Links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  display: inline-block;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #50c878;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-links a:hover {
+  background-color: #48a862;
+  color: #fff;
+}
+
+/* Settings Dropdown */
+/* Settings Dropdown */
+.settings-dropdown {
+  position: relative;
+}
+
+.settings-icon {
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #50c878;
+  margin-right: 20px; /* Adjust the value to move it left or right */
+  transition: transform 0.3s, color 0.3s;
+}
+
+.settings-icon:hover {
+  transform: rotate(45deg); /* Rotation effect on hover */
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1c1c1c;
+  border: 1px solid #50c878;
+  border-radius: 4px;
+  padding: 10px 15px; /* Added padding for better spacing */
+  z-index: 1100;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+  width: 200px; /* Ensure dropdown has enough width */
+}
+
+.settings-dropdown.open .dropdown-menu {
+  display: block; /* Show dropdown menu when active */
+}
+
+.dropdown-menu li {
+  list-style: none;
+  margin: 10px 0; /* Added margin for spacing between items */
+}
+
+.dropdown-menu a {
+  text-decoration: none;
+  color: #50c878;
+  font-size: 1rem;
+  display: block;
+  padding: 5px 10px; /* Added padding for better click area */
+  border-radius: 4px; /* Rounded edges for a cleaner look */
+}
+
+.dropdown-menu a:hover {
+  background-color: #48a862; /* Match hover effect */
+  color: #fff;
+}
+
+/* Mobile-specific Styling */
+@media (max-width: 600px) {
+  .hamburger {
+    display: flex; /* Show hamburger menu on small screens */
+  }
+
+  .nav-links {
+    display: none; /* Hide links initially */
+    flex-direction: column;
+    position: absolute;
+    top: 60px; /* Below navbar */
+    left: 0;
+    width: 100%;
+    background-color: #1c1c1c;
+    padding: 10px 0;
+    gap: 10px;
+    border-top: 1px solid #50c878;
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    display: flex; /* Show links when active */
+  }
+
+  .nav-links a {
+    text-align: center;
+    font-size: 1rem;
+    padding: 10px 0;
+  }
+
+  .settings-dropdown {
+    position: relative;
+    width: auto; /* Size based on content */
+    margin-right: 10px; /* Align to the right */
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 40px; /* Position below the settings icon */
+    right: 0; /* Align to the right edge */
+    background-color: #1c1c1c;
+    border: 1px solid #50c878;
+    border-radius: 4px;
+    width: 150px; /* Fixed width for consistency */
+    padding: 10px 0; /* Padding around dropdown */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Subtle shadow for depth */
+    z-index: 1100;
+  }
+
+  .settings-dropdown.open .dropdown-menu {
+    display: block; /* Show dropdown when clicked */
+  }
+
+  .dropdown-menu li {
+    list-style: none;
+    margin: 5px 0; /* Space between items */
+  }
+
+  .dropdown-menu a {
+    text-decoration: none;
+    color: #50c878;
+    font-size: 0.9rem; /* Slightly smaller font for mobile */
+    padding: 8px 10px; /* Larger clickable area */
+    display: block;
+    text-align: left; /* Align text to the left for readability */
+  }
+
+  .dropdown-menu a:hover {
+    background-color: #48a862; /* Match hover effect */
+    color: #fff;
+  }
+
+  .settings-icon {
+    font-size: 1.5rem; /* Adjust icon size for mobile */
+    cursor: pointer;
+  }
+}
