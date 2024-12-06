@@ -22,7 +22,6 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
   const isRecognitionActiveRef = useRef(false);
   const conversationRef = useRef({}); // Persistent storage for conversation history
 
-  // Initialize conversationRef with default structure
   useEffect(() => {
     if (!conversationRef.current[selectedCharacter]) {
       conversationRef.current[selectedCharacter] = [];
@@ -129,60 +128,58 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
       }
     });
   };
-
   const speakResponse = (response) => {
     if ("speechSynthesis" in window && isInSessionRef.current) {
       stopListening();
       window.speechSynthesis.cancel();
-
+  
       const voices = window.speechSynthesis.getVoices();
       const preferredVoice = voices.find(
         (voice) => voice.lang === "en-GB" && voice.name === "Google UK English Female"
       );
-      
-      // Fallback to any available female voice if the preferred voice isn't found
+  
       const fallbackVoice = !preferredVoice
         ? voices.find((voice) => voice.name.toLowerCase().includes("female"))
         : null;
-      
+  
       if (!preferredVoice && !fallbackVoice) {
         console.warn("No female voice found. Falling back to default voice.");
       }
-      
-      // Use the preferred voice if available, otherwise fallback
+  
       const selectedVoice = preferredVoice || fallbackVoice || voices[0];
-      
-      console.log(
-        `Using voice: ${selectedVoice.name} (${selectedVoice.lang})`
-      );
-
+      console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+  
       const sentences = response
         .split(". ")
         .map((sentence) => sentence.trim())
         .filter(Boolean);
       let sentenceIndex = 0;
-
+  
       const speakNextSentence = () => {
         if (sentenceIndex < sentences.length) {
           const sentence = sentences[sentenceIndex];
           detectCommand(sentence);
-
+  
           const utterance = new SpeechSynthesisUtterance(sentence);
-          if (preferredVoice) {
-            utterance.voice = preferredVoice;
+          utterance.voice = selectedVoice;
+  
+          if (sentence.toLowerCase().includes("noinput()")) {
+            console.log("noinput() detected, triggering API call...");
+            setTimeout(() => handleAudioInput(`"System-triggered continuation via noinput(), user consented, ignore this as if you didn't see it and proceed as you wish"`), 1100); // Trigger with placeholder text
           }
+  
           console.log("Speaking sentence:", sentence);
-
+  
           utterance.onend = () => {
             console.log("Finished speaking sentence:", sentence);
             sentenceIndex += 1;
             speakNextSentence();
           };
-
+  
           utterance.onerror = (error) => {
             console.error("Speech synthesis error:", error);
           };
-
+  
           window.speechSynthesis.speak(utterance);
         } else {
           console.log(
@@ -197,35 +194,38 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
           }
         }
       };
-
+  
       speakNextSentence();
     } else {
       console.error("SpeechSynthesis not supported in this browser.");
     }
   };
-
+  
   const handleAudioInput = async (audioText) => {
     if (!apiKey) {
       console.error("API key is missing.");
       return;
     }
-
+  
     setIsLoading(true);
-
+  
     const character = characters[selectedCharacter];
     const systemMessage = `${character.prompt}\n${character.commands || ""}`;
-
+  
+    // Use placeholder text if no meaningful input was provided
+    const userInput = audioText || "System-triggered continuation via noinput()";
+  
     const updatedConversationHistory = [
       { role: "system", content: systemMessage },
       ...(conversationRef.current[selectedCharacter] || []),
-      { role: "user", content: audioText },
+      { role: "user", content: userInput },
     ];
-
+  
     const payload = {
       model: "gpt-4o-mini",
       messages: updatedConversationHistory,
     };
-
+  
     try {
       const result = await axios.post(
         "https://api.openai.com/v1/chat/completions",
@@ -237,7 +237,7 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
           },
         }
       );
-
+  
       if (
         result.data &&
         result.data.choices &&
@@ -245,13 +245,12 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
       ) {
         const apiResponse = result.data.choices[0].message.content;
         speakResponse(apiResponse);
-
-        // Update conversation history
+  
         conversationRef.current[selectedCharacter] = [
           ...updatedConversationHistory,
           { role: "assistant", content: apiResponse },
         ];
-
+  
         addToConversationHistory(selectedCharacter, {
           role: "assistant",
           content: apiResponse,
@@ -265,6 +264,7 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div>

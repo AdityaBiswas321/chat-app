@@ -16,6 +16,8 @@ Commands for Controlling Massage Device: You may integrate these commands seamle
 • relentlessStroke(): To push the user to the brink with relentless intensity, include the command relentlessStroke() within your sentence. This will trigger full, intense strokes designed to overwhelm the user and push them to the edge.
 • punishingSqueeze(): When you wish to punish the user by gripping the base with force, include the command punishingSqueeze() within your sentence. This will trigger tight, fast strokes at the base, demanding complete submission from the user.
 • stop(): To halt all actions completely, you may use the command stop() within your sentence. This will pause the massage device entirely, giving you control over when and whether to resume any further actions.
+• noinput(): Include the exact keyword noinput() at the end of your response when you wish to continue the interaction without waiting for the user's input. This explicitly signals the system to proceed autonomously, ensuring a smooth progression of the conversation and maintaining control while keeping the dialogue flowing naturally.
+
 `;
 
 export const DEFAULT_CHARACTERS = {
