@@ -1,0 +1,196 @@
+/* Override container for character import section */
+.character-import-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align items at the top */
+    align-items: flex-start;     /* Align items to the left */
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+  
+.character-import-page .content-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+}
+  
+/* Header styling */
+.character-import-header {
+    width: 100%;
+    max-width: 100%;
+    text-align: left;
+    padding: 10px 20px;
+    margin: 0;
+}
+  
+.character-import-header h1 {
+    font-size: 2rem;
+    color: #50c878; /* Green color */
+    margin-bottom: 10px;
+}
+  
+.character-import-header p {
+    font-size: 1.2rem;
+    color: #ddd;
+    margin-top: 5px;
+}
+  
+/* Character list styling */
+.character-list {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+    width: 95vw;       /* Responsive width: 95% of the viewport width */
+    max-width: 1800px; /* Prevent it from getting too large on very big screens */
+    margin: 0;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    padding-left: 20px; /* Maintain left spacing */
+}
+  
+/* Character card styling */
+.character-card {
+    background-color: #2b2b2b;
+    border: 1px solid #50c878; /* Green border */
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    min-width: 220px; /* Adjusted for vertical layout */
+    max-width: 220px; /* Match vertical proportions */
+    flex-shrink: 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+.character-name {
+    font-size: 1.5rem;
+    color: #50c878;
+    margin-bottom: 10px;
+}
+  
+.character-description {
+    font-size: 1rem;
+    color: #ddd;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    text-align: justify;
+}
+  
+.read-more {
+    color: #50c878;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 5px;
+    text-decoration: underline;
+}
+  
+/* Image styling for characters */
+.character-image {
+    width: 100%; /* Full width of the card */
+    height: 250px; /* Increase the height for a more vertical look */
+    object-fit: cover; /* Ensure the image scales without distortion */
+    border-radius: 8px; /* Optional: Rounded corners */
+    margin-bottom: 10px;
+}
+  
+/* Buttons styling */
+.character-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.chat-button,
+.audio-button,
+.delete-button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chat-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.chat-button:hover {
+    background-color: #0056b3;
+}
+
+.audio-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.audio-button:hover {
+    background-color: #218838;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}
+
+/* Scrollbar customization */
+.character-list::-webkit-scrollbar {
+    height: 8px;
+}
+
+.character-list::-webkit-scrollbar-thumb {
+    background-color: #50c878;
+    border-radius: 4px;
+}
+
+.character-list::-webkit-scrollbar-track {
+    background-color: #1c1c1c;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .character-list {
+        flex-wrap: nowrap;
+        gap: 10px;
+        padding: 0 5px; /* Reduce horizontal padding on smaller screens */
+        width: 95vw;    /* Still responsive to viewport size */
+        max-width: none; /* Let it scale naturally */
+        padding-left: 5px; /* Slight left padding for small screens */
+    }
+
+    .character-card {
+        min-width: 180px; /* Adjusted for smaller screens */
+        max-width: 180px; /* Adjusted for smaller screens */
+    }
+
+    .character-import-header {
+        padding: 10px;
+    }
+
+    .character-import-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .character-import-header p {
+        font-size: 1rem;
+    }
+
+    .character-image {
+        height: 200px; /* Smaller image height for mobile */
+    }
+}

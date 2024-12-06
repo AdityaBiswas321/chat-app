@@ -1,0 +1,128 @@
+/* Character Manager Container */
+.character-manager-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: #1e1e1e;
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box; /* Ensure proper sizing for all elements */
+}
+
+/* Character Image Container */
+.character-manager-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Character Image */
+.character-manager-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%; /* Circular image */
+    border: 2px solid #2b2b2b; /* Subtle border matching dropdown */
+    object-fit: cover; /* Ensure proper scaling */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Subtle shadow */
+    margin-top: 10px; /* Add margin to separate from other elements */
+}
+
+/* Character Dropdown */
+.character-dropdown {
+    width: 100%;
+    max-width: 400px; /* Matches other input fields */
+    padding: 12px; /* Increased padding for better usability */
+    font-size: 1rem;
+    color: white;
+    background-color: #2b2b2b; /* Matches the manager background */
+    border: 1px solid #2b2b2b; /* Subtle border matching the dropdown */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4); /* Subtle shadow for depth */
+    appearance: none; /* Remove browser-specific dropdown styling */
+    margin-bottom: 20px; /* Space between dropdown and other elements */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer; /* Indicate interactable element */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.character-dropdown:hover {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5); /* Slightly more pronounced shadow */
+}
+
+.character-dropdown:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6); /* Enhanced shadow for focus */
+}
+
+/* Inputs and Textareas */
+.character-manager-input,
+.character-manager-textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #2b2b2b; /* Subtle matching border */
+    background-color: #2b2b2b;
+    color: white;
+    font-size: 1rem;
+    resize: none;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.character-manager-actions button,
+.character-manager-delete button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #50c878;
+    color: white;
+    margin-top: 10px;
+    width: 100%;
+    transition: background-color 0.2s ease;
+}
+
+.character-manager-actions button:hover,
+.character-manager-delete button:hover {
+    background-color: #3da65a;
+}
+
+/* Section Heading */
+.character-manager-container h3 {
+    color: #50c878;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .character-manager-container {
+        padding: 15px;
+    }
+
+    .character-manager-image {
+        width: 120px;
+        height: 120px;
+    }
+
+    .character-dropdown,
+    .character-manager-input,
+    .character-manager-textarea {
+        max-width: 100%;
+    }
+
+    .character-manager-actions button,
+    .character-manager-delete button {
+        width: 100%;
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as Handy from "@ohdoki/handy-sdk";
 import {
   gentlePat,
@@ -18,19 +18,35 @@ import {
   relentlessStroke,
   punishingSqueeze,
 } from "./HandyFunctions";
-import { useAppContext } from "../../context/AppContext"; // Import context
+import { useAppContext } from "../../context/AppContext";
 import styles from "./ChatAppComponents.module.css";
 
 function HandyController({ selectedCategory, apiCallCount }) {
-  const {
-    connectionKey,
-    setConnectionKey,
-    functionParameters,
-  } = useAppContext();
-  const [isConnected, setIsConnected] = React.useState(false);
-  const [isConnecting, setIsConnecting] = React.useState(false);
-  const [connectionError, setConnectionError] = React.useState("");
-  const [handy, setHandy] = React.useState(null);
+  const { connectionKey, setConnectionKey, functionParameters } =
+    useAppContext();
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionError, setConnectionError] = useState("");
+  const [handy, setHandy] = useState(null);
+  const [intensity, setIntensity] = useState(50); // Default intensity set to 50%
+  const [baselineVelocity, setBaselineVelocity] = useState(50); // Baseline velocity for current function
+
+  const MIN_INTENSITY = 1; // Minimum velocity
+  const MAX_INTENSITY = 90; // Maximum velocity
+  const INTENSITY_STEP = 2.5; // Increment/Decrement step size
+
+  // Reset intensity and baseline velocity when a new function is triggered
+  useEffect(() => {
+    if (selectedCategory) {
+      const initialVelocity =
+        functionParameters[selectedCategory]?.velocity || 50; // Use function's velocity or default to 50
+      setBaselineVelocity(initialVelocity);
+      setIntensity(initialVelocity); // Reset intensity to match the baseline
+      console.log(
+        `Intensity reset to ${initialVelocity}% for new function: ${selectedCategory}`
+      );
+    }
+  }, [selectedCategory, functionParameters]);
 
   // Function to initialize Handy and reconnect if disconnected
   const initHandy = async () => {
@@ -47,13 +63,16 @@ function HandyController({ selectedCategory, apiCallCount }) {
         const storedKey = await handy.getStoredKey();
         if (!isConnected || (storedKey && storedKey !== connectionKey)) {
           await handy.connect(connectionKey);
+          await handy.setMode(2); // Ensure HAMP mode is enabled
           setIsConnected(true);
-          console.log("Handy connected!");
+          console.log("Handy connected and set to HAMP mode!");
         }
       }
     } catch (error) {
       console.error("Failed to initialize or connect Handy:", error);
-      setConnectionError("Could not connect to Handy. Please check your connection key.");
+      setConnectionError(
+        "Could not connect to Handy. Please check your connection key."
+      );
       setIsConnected(false);
     } finally {
       setIsConnecting(false);
@@ -84,27 +103,17 @@ function HandyController({ selectedCategory, apiCallCount }) {
         await handy.hampStop();
         await new Promise((resolve) => setTimeout(resolve, 300));
         await handy.setStrokeZone({ min: 0, max: 100 });
-        await handy.setHampVelocity(50);
+        await handy.setHampVelocity(50); // Reset to 50% velocity
         await handy.hdsp(0, 10, "percent", "percent", true);
         await new Promise((resolve) => setTimeout(resolve, 500));
         await handy.disconnect(true); // Clear all states on disconnect
         setIsConnected(false);
-        console.log("Handy disconnected");
+        console.log("Handy disconnected and reset");
       } catch (error) {
         console.error("Failed to reset settings or disconnect:", error);
       }
     }
   };
-
-  // Clean up connection on component unmount
-  useEffect(() => {
-    if (handy && isConnected) {
-      return () => {
-        handy.disconnect();
-        setIsConnected(false);
-      };
-    }
-  }, [handy, isConnected]);
 
   // Handle LLM category selection
   useEffect(() => {
@@ -113,19 +122,18 @@ function HandyController({ selectedCategory, apiCallCount }) {
       return;
     }
 
-    // Actions that do not require parameters
     const actionsWithoutParameters = ["stop"];
 
-    // Adjust the condition to skip parameter check for actions without parameters
     if (
       !actionsWithoutParameters.includes(selectedCategory) &&
       (!functionParameters || !functionParameters[selectedCategory])
     ) {
-      console.error(`Error: Missing parameters for ${selectedCategory}. Cannot trigger function.`);
+      console.error(
+        `Error: Missing parameters for ${selectedCategory}. Cannot trigger function.`
+      );
       return;
     }
 
-    // Dynamically pass function parameters to the Handy functions
     switch (selectedCategory) {
       case "gentlePat":
         gentlePat(handy, isConnected, functionParameters.gentlePat);
@@ -140,7 +148,7 @@ function HandyController({ selectedCategory, apiCallCount }) {
         handleDeny(handy, isConnected, functionParameters.deny);
         break;
       case "stop":
-        handleStop(handy, isConnected); // No parameters needed
+        handleStop(handy, isConnected);
         break;
       case "rapidHeadStroke":
         rapidHeadStroke(handy, isConnected, functionParameters.rapidHeadStroke);
@@ -170,15 +178,44 @@ function HandyController({ selectedCategory, apiCallCount }) {
         initialSeizure(handy, isConnected, functionParameters.initialSeizure);
         break;
       case "relentlessStroke":
-        relentlessStroke(handy, isConnected, functionParameters.relentlessStroke);
+        relentlessStroke(
+          handy,
+          isConnected,
+          functionParameters.relentlessStroke
+        );
         break;
       case "punishingSqueeze":
-        punishingSqueeze(handy, isConnected, functionParameters.punishingSqueeze);
+        punishingSqueeze(
+          handy,
+          isConnected,
+          functionParameters.punishingSqueeze
+        );
         break;
       default:
         console.error("Unknown action:", selectedCategory);
     }
   }, [selectedCategory, apiCallCount, isConnected, functionParameters]);
+
+  // Adjust intensity based on the baseline velocity
+  const adjustIntensity = async (step) => {
+    const newIntensity = Math.max(
+      MIN_INTENSITY,
+      Math.min(MAX_INTENSITY, intensity + step) // Use current intensity as baseline
+    );
+    setIntensity(newIntensity); // Update intensity state
+    setBaselineVelocity(newIntensity); // Update baseline velocity
+
+    if (handy && isConnected) {
+      try {
+        await handy.setHampVelocity(newIntensity);
+        console.log(`Handy velocity adjusted to ${newIntensity}%`);
+      } catch (error) {
+        console.error("Error adjusting intensity:", error);
+      }
+    } else {
+      console.warn("Handy is not connected. Cannot adjust intensity.");
+    }
+  };
 
   return (
     <div className={styles["handy-controller"]}>
@@ -206,6 +243,22 @@ function HandyController({ selectedCategory, apiCallCount }) {
         {connectionError && (
           <p className={styles["error-message"]}>{connectionError}</p>
         )}
+      </div>
+      <div style={{ textAlign: "center", margin: "1rem 0" }}>
+        <h3>Adjust Device Intensity</h3>
+        <button
+          onClick={() => adjustIntensity(-INTENSITY_STEP)} // Decrease by 2.5%
+          style={{ marginRight: "1rem", fontSize: "20px" }}
+        >
+          ↓
+        </button>
+        <span style={{ fontSize: "1.5rem" }}>{intensity}%</span>
+        <button
+          onClick={() => adjustIntensity(INTENSITY_STEP)} // Increase by 2.5%
+          style={{ marginLeft: "1rem", fontSize: "20px" }}
+        >
+          ↑
+        </button>
       </div>
     </div>
   );

@@ -6,6 +6,10 @@ See the [LICENSE](./LICENSE) file for details.
 ## Contributing
 Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) and sign the [Contributor License Agreement (CLA)](CLA.md) before submitting a pull request
 
+## Contributors
+Thanks to the following people for contributing to this project:
+
+- [notnodnod](https://github.com/notnodnod): Cleanup and removal of unused files, simplifying project navigation.
 
 
 # Getting Started with Create React App

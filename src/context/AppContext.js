@@ -66,6 +66,20 @@ export const AppProvider = ({ children }) => {
     }));
   };
 
+  const importCharacter = (characterKey, characterData) => {
+    // Ensure character is not already added
+    if (!characters[characterKey]) {
+      setCharacters((prev) => ({
+        ...prev,
+        [characterKey]: characterData,
+      }));
+      setConversationHistories((prev) => ({
+        ...prev,
+        [characterKey]: [],
+      }));
+    }
+  };
+
   const updateCharacter = (characterKey, updatedCharacter) => {
     setCharacters((prev) => ({
       ...prev,
@@ -118,6 +132,7 @@ export const AppProvider = ({ children }) => {
         selectedCharacter,
         setSelectedCharacter,
         addCharacter,
+        importCharacter,
         updateCharacter,
         deleteCharacter,
         addToConversationHistory,

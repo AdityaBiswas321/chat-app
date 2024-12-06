@@ -40,7 +40,7 @@ function UncensoredChatPage() {
         <h1>Uncensored Handy Augmented Chat - Underdevelopment</h1>
       </div>
 
-      {!isKeyValid ? (
+      {/* {!isKeyValid ? (
         // Display API key input screen
         <div className="api-key-input">
           <h3>Enter Your Uncensored API Key</h3>
@@ -56,7 +56,7 @@ function UncensoredChatPage() {
       ) : (
         // Once validated, load the chat component
         <LLMConnector apiKey={apiKey} />
-      )}
+      )} */}
     </div>
   );
 }

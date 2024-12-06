@@ -12,15 +12,17 @@ import AudioInteract from "./pages/AudioInteract";
 import UncensoredChatPage from "./pages/Uncensoredchatpage";
 import CharacterImport from "./pages/CharacterImport";
 import FunctionEditor from "./pages/FunctionEditor";
-
+import { AppProvider } from "./context/AppContext";
 import "./CSS/App.css";
 import "./CSS/navbar.css";
 
 function App() {
   return (
-    <Router>
-      <MainApp />
-    </Router>
+    <AppProvider>
+      <Router>
+        <MainApp />
+      </Router>
+    </AppProvider>
   );
 }
 
@@ -83,7 +85,13 @@ function MainApp() {
         {/* Navigation Links */}
         <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
           <li>
-            <Link to="/" onClick={() => { handleChatClick(); closeMenu(); }}>
+            <Link
+              to="/"
+              onClick={() => {
+                handleChatClick();
+                closeMenu();
+              }}
+            >
               Chat with Handy-LLM
             </Link>
           </li>
@@ -131,6 +139,8 @@ function MainApp() {
           <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
           <Route path="/character-import" element={<CharacterImport />} />
           <Route path="/function-editor" element={<FunctionEditor />} />
+          <Route path="/chat/:characterKey" element={<ChatPage />} />
+          <Route path="/audio/:characterKey" element={<AudioInteract />} />
         </Routes>
       </div>
     </div>

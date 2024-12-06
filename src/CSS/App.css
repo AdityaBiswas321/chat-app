@@ -1,4 +1,6 @@
 /* General App Styling */
+
+
 .App {
   text-align: center;
   background-color: #1c1c1c;
@@ -6,25 +8,25 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  align-items: center; /* Keep horizontal centering if desired */
+  justify-content: flex-start; /* Align content to the top */
   margin: 0;
   padding: 0;
-  box-sizing: border-box; /* Ensure padding is included in the width */
-  overflow-x: hidden; /* Prevent horizontal scrolling due to overflow */
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Navbar styling */
 /*  */
 
-/* Content Styling */
-.content-container {
-  width: 100%;
-  max-width: 1200px; /* Ensure content doesn’t stretch too wide */
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box; /* Include padding within the width */
+.character-import-page .content-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
 }
+
+
 
 /* Header styling with Help Icon */
 .header {
@@ -102,6 +104,9 @@
 .modal-content button:hover {
   background-color: #48a862;
 }
+
+
+
 
 /* Mobile-specific adjustments in app.css */
 @media (max-width: 600px) {
