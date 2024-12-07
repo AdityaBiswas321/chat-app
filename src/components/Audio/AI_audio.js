@@ -307,9 +307,19 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
       >
         Reset Conversation
       </button>
-      <button onClick={() => removeLastInteraction(selectedCharacter)}>
-        Remove Last Interaction
-      </button>
+      <button
+  onClick={() => {
+    // Update the global state
+    removeLastInteraction(selectedCharacter);
+
+    // Update the local conversationRef to stay in sync
+    if (conversationRef.current[selectedCharacter]) {
+      conversationRef.current[selectedCharacter].pop();
+    }
+  }}
+>
+  Remove Last Interaction
+</button>
 
       {isListening && <p>Listening...</p>}
     </div>

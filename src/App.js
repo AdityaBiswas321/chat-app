@@ -12,6 +12,7 @@ import AudioInteract from "./pages/AudioInteract";
 import UncensoredChatPage from "./pages/Uncensoredchatpage";
 import CharacterImport from "./pages/CharacterImport";
 import FunctionEditor from "./pages/FunctionEditor";
+import CharacterDetails from "./pages/CharacterDetails.js";
 import { AppProvider } from "./context/AppContext";
 import "./CSS/App.css";
 import "./CSS/navbar.css";
@@ -132,16 +133,17 @@ function MainApp() {
 
       {/* Routes for each page */}
       <div className="content-container">
-        <Routes>
-          <Route path="/" element={<ChatPage />} />
-          <Route path="/video-script" element={<VideoScriptPlayer />} />
-          <Route path="/audio-interact" element={<AudioInteract />} />
-          <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
-          <Route path="/character-import" element={<CharacterImport />} />
-          <Route path="/function-editor" element={<FunctionEditor />} />
-          <Route path="/chat/:characterKey" element={<ChatPage />} />
-          <Route path="/audio/:characterKey" element={<AudioInteract />} />
-        </Routes>
+      <Routes>
+  <Route path="/" element={<ChatPage />} />
+  <Route path="/video-script" element={<VideoScriptPlayer />} />
+  <Route path="/audio-interact" element={<AudioInteract />} />
+  <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
+  <Route path="/character-import" element={<CharacterImport />} />
+  <Route path="/function-editor" element={<FunctionEditor />} />
+  <Route path="/chat/:characterKey" element={<ChatPage />} />
+  <Route path="/audio/:characterKey" element={<AudioInteract />} />
+  <Route path="/character-details/:characterKey" element={<CharacterDetails />} />
+</Routes>
       </div>
     </div>
   );

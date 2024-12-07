@@ -59,10 +59,10 @@
     border: 1px solid #50c878; /* Green border */
     border-radius: 8px;
     padding: 20px;
-    text-align: center;
+    text-align: left; /* Align content to the left for readability */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-    min-width: 220px; /* Adjusted for vertical layout */
-    max-width: 220px; /* Match vertical proportions */
+    min-width: 240px; /* Adjusted for vertical layout */
+    max-width: 240px; /* Match vertical proportions */
     flex-shrink: 0;
     transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -77,13 +77,20 @@
     color: #50c878;
     margin-bottom: 10px;
 }
-  
-.character-description {
+
+.character-personality {
     font-size: 1rem;
     color: #ddd;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     line-height: 1.5;
+}
+
+.character-background {
+    font-size: 1rem;
+    color: #ddd;
+    margin-bottom: 10px;
     text-align: justify;
+    line-height: 1.6;
 }
   
 .read-more {
@@ -97,7 +104,7 @@
 /* Image styling for characters */
 .character-image {
     width: 100%; /* Full width of the card */
-    height: 250px; /* Increase the height for a more vertical look */
+    height: 250px; /* Adjusted for vertical look */
     object-fit: cover; /* Ensure the image scales without distortion */
     border-radius: 8px; /* Optional: Rounded corners */
     margin-bottom: 10px;
@@ -168,14 +175,15 @@
         flex-wrap: nowrap;
         gap: 10px;
         padding: 0 5px; /* Reduce horizontal padding on smaller screens */
-        width: 95vw;    /* Still responsive to viewport size */
+        width: 95vw;    /* Responsive to viewport size */
         max-width: none; /* Let it scale naturally */
         padding-left: 5px; /* Slight left padding for small screens */
     }
 
     .character-card {
         min-width: 180px; /* Adjusted for smaller screens */
-        max-width: 180px; /* Adjusted for smaller screens */
+        max-width: 180px; /* Match mobile scale */
+        padding: 15px; /* Slightly smaller padding */
     }
 
     .character-import-header {
@@ -192,5 +200,16 @@
 
     .character-image {
         height: 200px; /* Smaller image height for mobile */
+    }
+
+    .read-more {
+        font-size: 0.9rem;
+    }
+
+    .chat-button,
+    .audio-button,
+    .delete-button {
+        padding: 8px 10px; /* Reduce padding for buttons */
+        font-size: 0.8rem; /* Smaller font for mobile */
     }
 }

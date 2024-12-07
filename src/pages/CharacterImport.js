@@ -31,6 +31,10 @@ function CharacterImport() {
     setExpandedCharacter((prev) => (prev === characterKey ? null : characterKey));
   };
 
+  const handleCharacterClick = (characterKey) => {
+    navigate(`/character-details/${characterKey}`);
+  };
+
   return (
     <div className="App">
       <div className="character-import-page">
@@ -43,29 +47,67 @@ function CharacterImport() {
         <h2>Default Characters</h2>
         <div className="character-list">
           {Object.entries(characters).map(([key, character]) => (
-            <div key={key} className="character-card">
+            <div
+              key={key}
+              className="character-card"
+              onClick={() => handleCharacterClick(key)}
+              style={{ cursor: "pointer" }}
+            >
               <img
                 src={character.image || "default.jpg"} // Use default image if none provided
                 alt={`${character.name} image`}
                 className="character-image"
               />
               <h3 className="character-name">{character.name}</h3>
-              <p className="character-description">
+              <p className="character-personality">
+                <strong>Traits:</strong> {character.personalityTraits?.join(", ") || "N/A"}
+              </p>
+              <p className="character-background">
                 {expandedCharacter === key
-                  ? character.prompt
-                  : `${character.prompt.substring(0, 50)}...`}
+                  ? (
+                    <>
+                      <strong>Background:</strong> {character.backgroundStory || "N/A"}<br />
+                      <strong>Interaction Type:</strong> {character.interactionType || "N/A"}<br />
+                      <strong>Goals:</strong> {character.goals || "N/A"}<br />
+                      <strong>Reaction Style:</strong> {character.reactionStyle || "N/A"}
+                    </>
+                  )
+                  : `${character.backgroundStory.substring(0, 100)}...`}
                 <span
                   className="read-more"
-                  onClick={() => toggleReadMore(key)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleReadMore(key);
+                  }}
                 >
                   {expandedCharacter === key ? " Show Less" : " Read More"}
                 </span>
               </p>
               <div className="character-actions">
-                <button onClick={() => handleCharacterSelect(key, "chat")}>Chat</button>
-                <button onClick={() => handleCharacterSelect(key, "audio")}>Audio</button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCharacterSelect(key, "chat");
+                  }}
+                >
+                  Chat
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCharacterSelect(key, "audio");
+                  }}
+                >
+                  Audio
+                </button>
                 {!nonDeletableCharacters.includes(key) && (
-                  <button className="delete-button" onClick={() => handleDeleteCharacter(key)}>
+                  <button
+                    className="delete-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCharacter(key);
+                    }}
+                  >
                     Delete
                   </button>
                 )}
@@ -75,7 +117,10 @@ function CharacterImport() {
         </div>
 
         {/* Available Characters */}
-        <AvailableCharacters />
+        <AvailableCharacters
+          expandedCharacter={expandedCharacter}
+          toggleReadMore={toggleReadMore}
+        />
       </div>
     </div>
   );
