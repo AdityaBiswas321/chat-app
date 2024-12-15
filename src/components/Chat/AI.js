@@ -67,18 +67,22 @@ const LLMConnector = ({ onCategorySelect }) => {
       );
 
       if (
-        result.data &&
-        result.data.choices &&
-        result.data.choices.length > 0
+        result?.data?.choices?.length > 0
       ) {
         const apiResponse = result.data.choices[0].message.content;
         setResponse(apiResponse);
 
-        // Append the AI's response to the conversation history
-        addToConversationHistory(selectedCharacter, {
+        // Append the user's message and the AI's response to the conversation history
+        addToConversationHistory(selectedCharacter, [
+          {
+            role: "user",
+            content: message,
+          },
+          {
           role: "assistant",
           content: apiResponse,
-        });
+          }
+        ]);
 
         // Detect and handle the commands from the response
         const lowerCaseResponse = apiResponse.toLowerCase();
