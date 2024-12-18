@@ -22,7 +22,12 @@ import * as Handy from "@ohdoki/handy-sdk";
 import "../CSS/FunctionEditor.css";
 
 const FunctionEditor = () => {
-  const { functionParameters, updateFunctionParameters, connectionKey, setConnectionKey } = useAppContext();
+  const {
+    functionParameters,
+    updateFunctionParameters,
+    connectionKey,
+    setConnectionKey,
+  } = useAppContext();
   const [selectedFunction, setSelectedFunction] = useState("");
   const [parameters, setParameters] = useState({ min: 0, max: 100, velocity: 10 });
   const [handy, setHandy] = useState(null);
@@ -60,6 +65,7 @@ const FunctionEditor = () => {
 
   useEffect(() => {
     initHandy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectionKey, handy]);
 
   const handleConnectClick = () => {
@@ -90,23 +96,25 @@ const FunctionEditor = () => {
     setParameters(functionParameters[selected]); // Load parameters for selected function
   };
 
-  // Handle slider change
+  // Handle slider changes for parameters
   const handleParameterChange = (e) => {
     const { name, value } = e.target;
 
-    // Ensure Min cannot exceed Max and vice versa
     setParameters((prev) => {
       const newParams = { ...prev, [name]: Number(value) };
+
+      // Ensure Min cannot exceed Max and vice versa
       if (name === "min" && newParams.min > newParams.max) {
         newParams.max = newParams.min;
       } else if (name === "max" && newParams.max < newParams.min) {
         newParams.min = newParams.max;
       }
+
       return newParams;
     });
   };
 
-  // Update function parameters in context
+  // Update function parameters in context and local storage
   const handleUpdateFunction = () => {
     if (selectedFunction) {
       updateFunctionParameters(selectedFunction, parameters);
@@ -114,7 +122,7 @@ const FunctionEditor = () => {
     }
   };
 
-  // Test function
+  // Test a specific function
   const handleTestFunction = async (funcName) => {
     if (!handy || !isConnected) {
       console.error("Handy is not connected. Cannot test function.");
@@ -127,7 +135,7 @@ const FunctionEditor = () => {
       return;
     }
 
-    // Dynamically call the respective function with the latest parameters
+    // Dynamically call the respective function
     switch (funcName) {
       case "gentlePat":
         await gentlePat(handy, isConnected, currentParameters);
@@ -185,10 +193,14 @@ const FunctionEditor = () => {
     handleStop(handy, isConnected);
   };
 
+  // Reset everything to defaults
+  const handleResetToDefaults = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   return (
     <div className="function-editor-container">
-      
-
       {/* Function List */}
       <div className="function-list">
         <h2>Function List</h2>
@@ -209,26 +221,26 @@ const FunctionEditor = () => {
       {/* Function Editor */}
       <div className="function-editor">
         {/* Connection Management */}
-      <div className="connection-management">
-        <input
-          type="text"
-          value={connectionKey}
-          onChange={(e) => setConnectionKey(e.target.value)}
-          placeholder="Enter Handy Connection Key"
-        />
-        <button onClick={handleConnectClick} disabled={isConnecting}>
-          {isConnecting ? "Connecting..." : "Connect"}
-        </button>
-        <button onClick={handleDisconnect} disabled={!isConnected}>
-          Disconnect
-        </button>
-        <span
-          className={`connection-status ${isConnected ? "connected" : "disconnected"}`}
-        >
-          {isConnected ? "✅ Connected" : "❌ Disconnected"}
-        </span>
-        {connectionError && <p className="error">{connectionError}</p>}
-      </div>
+        <div className="connection-management">
+          <input
+            type="text"
+            value={connectionKey}
+            onChange={(e) => setConnectionKey(e.target.value)}
+            placeholder="Enter Handy Connection Key"
+          />
+          <button onClick={handleConnectClick} disabled={isConnecting}>
+            {isConnecting ? "Connecting..." : "Connect"}
+          </button>
+          <button onClick={handleDisconnect} disabled={!isConnected}>
+            Disconnect
+          </button>
+          <span
+            className={`connection-status ${isConnected ? "connected" : "disconnected"}`}
+          >
+            {isConnected ? "✅ Connected" : "❌ Disconnected"}
+          </span>
+          {connectionError && <p className="error">{connectionError}</p>}
+        </div>
         <h1>Function Editor</h1>
         <label htmlFor="function-select">Select a Function:</label>
         <select
@@ -247,54 +259,64 @@ const FunctionEditor = () => {
         </select>
 
         {selectedFunction && (
-  <div className="parameter-editor">
-    <h2>Edit Parameters for {selectedFunction}</h2>
-    <div className="range-slider">
-      <label className="slider-label">
-        Min - Max: {parameters.min} - {parameters.max}
-      </label>
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={parameters.min}
-        name="min"
-        onChange={handleParameterChange}
-      />
-      <input
-        type="range"
-        min="0"
-        max="100"
-        value={parameters.max}
-        name="max"
-        onChange={handleParameterChange}
-      />
-      <div
-        className="range-track"
-        style={{
-          left: `${parameters.min}%`,
-          right: `${100 - parameters.max}%`,
-        }}
-      />
-    </div>
-    <div>
-      <label>
-        Velocity: {parameters.velocity}
-      </label>
-      <input
-        type="range"
-        min="0"
-        max="50"
-        value={parameters.velocity}
-        name="velocity"
-        onChange={handleParameterChange}
-      />
-    </div>
-    <button onClick={handleUpdateFunction}>Update Function</button>
-  </div>
-)}
-
+          <div className="parameter-editor">
+            <h2>Edit Parameters for {selectedFunction}</h2>
+            <div className="range-slider">
+              <label className="slider-label">
+                Min - Max: {parameters.min} - {parameters.max}
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={parameters.min}
+                name="min"
+                onChange={handleParameterChange}
+              />
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={parameters.max}
+                name="max"
+                onChange={handleParameterChange}
+              />
+              <div
+                className="range-track"
+                style={{
+                  left: `${parameters.min}%`,
+                  right: `${100 - parameters.max}%`,
+                }}
+              />
+            </div>
+            <div>
+              <label>
+                Velocity: {parameters.velocity}
+              </label>
+              <input
+                type="range"
+                min="0"
+                max="50"
+                value={parameters.velocity}
+                name="velocity"
+                onChange={handleParameterChange}
+              />
+            </div>
+            <button onClick={handleUpdateFunction}>Update Function</button>
+            
+          </div>
+        )}
       </div>
+      <button
+              onClick={handleResetToDefaults}
+              style={{
+                marginTop: "10px",
+                backgroundColor: "#f44336",
+                color: "#fff",
+              }}
+            >
+              Reset App
+            </button>
     </div>
   );
 };

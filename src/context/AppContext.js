@@ -39,8 +39,8 @@ export const AppProvider = ({ children }) => {
   const [functionParameters, setFunctionParameters] = useLocalStorage("functionParameters", DEFAULT_FUNCTION_PARAMETERS);
 
   // New Local LLM Configuration
-  const BASE_URL = "http://localhost:10001"; // Default endpoint for local LLM
-  const BASE_MODEL = "ollama/llama2"; // Example local model name
+  const [baseUrl, setBaseUrl] = useLocalStorage("baseUrl", "https://api.openai.com");
+  const [baseModel, setBaseModel] = useLocalStorage("baseModel", "gpt-4o-mini");
 
   // Update function parameters strictly
   const updateFunctionParameters = (functionName, updatedParameters) => {
@@ -152,8 +152,10 @@ export const AppProvider = ({ children }) => {
         setConnectionKey,
         functionParameters,
         updateFunctionParameters, // Expose function parameter management,
-        BASE_URL, // Expose BASE_URL
-        BASE_MODEL, // Expose BASE_MODEL
+        baseUrl, // Persisted and shared baseUrl
+        setBaseUrl,
+        baseModel, // Persisted and shared baseModel
+        setBaseModel,
       }}
     >
       {children}

@@ -14,12 +14,14 @@ const LocalConnector = ({ onCategorySelect }) => {
     removeLastInteraction,
     apiKey,
     setApiKey,
+    baseUrl,
+    setBaseUrl,
+    baseModel,
+    setBaseModel,
   } = useAppContext();
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState("");
-  const [baseUrl, setBaseUrl] = useState("https://api.openai.com"); // Default BASE_URL
-  const [baseModel, setBaseModel] = useState("gpt-4o-mini"); // Default BASE_MODEL
 
   useEffect(() => {
     if (conversationHistories[selectedCharacter]?.length === 0) {
@@ -33,7 +35,7 @@ const LocalConnector = ({ onCategorySelect }) => {
       setResponse("Please enter a valid BASE URL and BASE MODEL.");
       return;
     }
-
+    setResponse("");
     setLoading(true);
 
     const character = characters[selectedCharacter];
@@ -73,13 +75,15 @@ const LocalConnector = ({ onCategorySelect }) => {
 
       while (true) {
         const { done, value } = await reader.read();
+        console.log("Read chunk done:", done, "value:", value);
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true }).trim();
-
+        console.log("Decoded chunk:", chunk);
         // Ignore the sentinel message "[DONE]"
         if (chunk === "[DONE]") break;
 
+        console.log("Raw chunk before parsing:", trimmedChunk);
         // Extract and parse JSON chunks
         const parsedChunks = chunk
           .split("data:")
