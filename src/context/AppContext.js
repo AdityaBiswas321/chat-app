@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext } from "react";
 import { DEFAULT_CHARACTERS } from "../components/Character/CharacterPrompts"; // Import default characters
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 // Create the Context
 const AppContext = createContext();
@@ -25,17 +26,17 @@ const DEFAULT_FUNCTION_PARAMETERS = {
 
 // Provider Component
 export const AppProvider = ({ children }) => {
-  const [characters, setCharacters] = useState(DEFAULT_CHARACTERS);
-  const [conversationHistories, setConversationHistories] = useState({
+  const [characters, setCharacters] = useLocalStorage("characters", DEFAULT_CHARACTERS);
+  const [conversationHistories, setConversationHistories] = useLocalStorage("conversationHistories", {
     characterbuilder: [],
     mistress: [],
     teacher: [],
     therapist: [],
   });
-  const [selectedCharacter, setSelectedCharacter] = useState("mistress");
-  const [apiKey, setApiKey] = useState("");
-  const [connectionKey, setConnectionKey] = useState("");
-  const [functionParameters, setFunctionParameters] = useState(DEFAULT_FUNCTION_PARAMETERS);
+  const [selectedCharacter, setSelectedCharacter] = useLocalStorage("selectedCharacter", "mistress");
+  const [apiKey, setApiKey] = useLocalStorage("apiKey", "");
+  const [connectionKey, setConnectionKey] = useLocalStorage("connectionKey", "");
+  const [functionParameters, setFunctionParameters] = useLocalStorage("functionParameters", DEFAULT_FUNCTION_PARAMETERS);
 
   // Update function parameters strictly
   const updateFunctionParameters = (functionName, updatedParameters) => {
@@ -100,10 +101,13 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const addToConversationHistory = (characterKey, message) => {
+  const addToConversationHistory = (characterKey, messages) => {
     setConversationHistories((prev) => ({
       ...prev,
-      [characterKey]: [...(prev[characterKey] || []), message],
+      [characterKey]: [
+        ...(prev[characterKey] || []),
+        ...(Array.isArray(messages) ? messages : [messages])
+      ],
     }));
   };
 
