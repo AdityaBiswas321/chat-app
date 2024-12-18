@@ -53,6 +53,8 @@ const LocalConnector = ({ onCategorySelect }) => {
       stream: true,
     };
 
+    console.log("Sending payload:", payload);
+
     try {
       const responseStream = await fetch(`${baseUrl}/v1/chat/completions`, {
         method: "POST",
