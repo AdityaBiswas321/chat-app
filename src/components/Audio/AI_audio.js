@@ -13,6 +13,7 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
     addToConversationHistory,
     resetConversation,
     removeLastInteraction,
+    conversationHistories
   } = useAppContext();
 
   const [isListening, setIsListening] = useState(false);
@@ -24,9 +25,11 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
 
   useEffect(() => {
     if (!conversationRef.current[selectedCharacter]) {
-      conversationRef.current[selectedCharacter] = [];
+      conversationRef.current[selectedCharacter] =
+        [...(conversationHistories[selectedCharacter] || [])]; // Load from global state
     }
-  }, [selectedCharacter]);
+  }, [selectedCharacter, conversationHistories]);
+  
 
   useEffect(() => {
     if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
@@ -251,10 +254,16 @@ const AI_Audio = ({ onCategorySelect = () => {} }) => {
           { role: "assistant", content: apiResponse },
         ];
   
-        addToConversationHistory(selectedCharacter, {
+        addToConversationHistory(selectedCharacter, [
+          {
+            role: "user",
+            content: audioText,
+          },
+          {
           role: "assistant",
           content: apiResponse,
-        });
+          }
+        ]);
       } else {
         console.error("No response from OpenAI API.");
       }

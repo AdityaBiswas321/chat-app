@@ -14,6 +14,7 @@ import CharacterImport from "./pages/CharacterImport";
 import FunctionEditor from "./pages/FunctionEditor";
 import CharacterDetails from "./pages/CharacterDetails.js";
 import { AppProvider } from "./context/AppContext";
+import LocalConnector from "./pages/LocalPage";
 import "./CSS/App.css";
 import "./CSS/navbar.css";
 
@@ -127,23 +128,33 @@ function MainApp() {
                 Edit Functions
               </Link>
             </li>
+            <li>
+              <Link to="/local-connector" onClick={closeMenu}>
+                Local Connector
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
 
       {/* Routes for each page */}
       <div className="content-container">
-      <Routes>
-  <Route path="/" element={<ChatPage />} />
-  <Route path="/video-script" element={<VideoScriptPlayer />} />
-  <Route path="/audio-interact" element={<AudioInteract />} />
-  <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
-  <Route path="/character-import" element={<CharacterImport />} />
-  <Route path="/function-editor" element={<FunctionEditor />} />
-  <Route path="/chat/:characterKey" element={<ChatPage />} />
-  <Route path="/audio/:characterKey" element={<AudioInteract />} />
-  <Route path="/character-details/:characterKey" element={<CharacterDetails />} />
-</Routes>
+        <Routes>
+          <Route path="/" element={<ChatPage />} />
+          <Route path="/video-script" element={<VideoScriptPlayer />} />
+          <Route path="/audio-interact" element={<AudioInteract />} />
+          <Route path="/uncensored-chat" element={<UncensoredChatPage />} />
+          <Route path="/character-import" element={<CharacterImport />} />
+          <Route path="/function-editor" element={<FunctionEditor />} />
+          <Route path="/chat/:characterKey" element={<ChatPage />} />
+          <Route path="/audio/:characterKey" element={<AudioInteract />} />
+          <Route
+            path="/character-details/:characterKey"
+            element={<CharacterDetails />}
+          />
+          <Route path="/local-connector" element={<LocalConnector />} />
+          {/* New Route */}
+        </Routes>
       </div>
     </div>
   );

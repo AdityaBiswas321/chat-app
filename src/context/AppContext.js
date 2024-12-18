@@ -38,6 +38,10 @@ export const AppProvider = ({ children }) => {
   const [connectionKey, setConnectionKey] = useLocalStorage("connectionKey", "");
   const [functionParameters, setFunctionParameters] = useLocalStorage("functionParameters", DEFAULT_FUNCTION_PARAMETERS);
 
+  // New Local LLM Configuration
+  const BASE_URL = "http://localhost:10001"; // Default endpoint for local LLM
+  const BASE_MODEL = "ollama/llama2"; // Example local model name
+
   // Update function parameters strictly
   const updateFunctionParameters = (functionName, updatedParameters) => {
     setFunctionParameters((prev) => {
@@ -147,7 +151,9 @@ export const AppProvider = ({ children }) => {
         connectionKey,
         setConnectionKey,
         functionParameters,
-        updateFunctionParameters, // Expose function parameter management
+        updateFunctionParameters, // Expose function parameter management,
+        BASE_URL, // Expose BASE_URL
+        BASE_MODEL, // Expose BASE_MODEL
       }}
     >
       {children}
