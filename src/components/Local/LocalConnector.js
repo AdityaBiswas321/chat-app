@@ -85,7 +85,7 @@ const LocalConnector = ({ onCategorySelect }) => {
         // Ignore the sentinel message "[DONE]"
         if (chunk === "[DONE]") break;
 
-        console.log("Raw chunk before parsing:", trimmedChunk);
+        
         // Extract and parse JSON chunks
         const parsedChunks = chunk
           .split("data:")
