@@ -28,7 +28,6 @@ const LocalConnector = ({ onCategorySelect }) => {
       setResponse("");
     }
   }, [conversationHistories, selectedCharacter]);
-  
 
   const handleSend = async (message) => {
     if (!baseUrl || !baseModel) {
@@ -77,16 +76,11 @@ const LocalConnector = ({ onCategorySelect }) => {
 
       while (true) {
         const { done, value } = await reader.read();
-        console.log("Read chunk done:", done, "value:", value);
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true }).trim();
-        console.log("Decoded chunk:", chunk);
-        // Ignore the sentinel message "[DONE]"
         if (chunk === "[DONE]") break;
 
-        
-        // Extract and parse JSON chunks
         const parsedChunks = chunk
           .split("data:")
           .map((chunk) => chunk.trim())
@@ -99,13 +93,13 @@ const LocalConnector = ({ onCategorySelect }) => {
               return null;
             }
           })
-          .filter(Boolean); // Filter out invalid chunks
+          .filter(Boolean);
 
         for (const parsedChunk of parsedChunks) {
           const content = parsedChunk?.choices?.[0]?.delta?.content;
           if (content) {
             accumulatedResponse += content;
-            setResponse((prev) => prev + content); // Update response dynamically
+            setResponse((prev) => prev + content);
           }
         }
       }
@@ -116,7 +110,7 @@ const LocalConnector = ({ onCategorySelect }) => {
         { role: "assistant", content: accumulatedResponse },
       ]);
 
-      // Detect and handle the commands from the final response
+      // Detect and handle commands AFTER reading the entire response
       const lowerCaseResponse = accumulatedResponse.toLowerCase();
       if (lowerCaseResponse.includes("gentlepat()")) {
         console.log("Trigger detected: gentlePat");
@@ -167,9 +161,8 @@ const LocalConnector = ({ onCategorySelect }) => {
         console.log("Trigger detected: punishingSqueeze");
         onCategorySelect("punishingSqueeze");
       } else {
-        console.error("No trigger word found in AI response.");
+        console.log("No trigger word found in AI response.");
       }
-      // Add more trigger logic as needed...
 
     } catch (error) {
       console.error("Error connecting to model:", error);
@@ -181,44 +174,44 @@ const LocalConnector = ({ onCategorySelect }) => {
 
   return (
     <div className={styles["llm-connector"]}>
-    <div className={styles["settings-container"]}>
-      <label>
-        Base URL:
-        <input
-          type="text"
-          value={baseUrl}
-          onChange={(e) => setBaseUrl(e.target.value)}
-          placeholder="http://localhost:10001"
-        />
-      </label>
-      <label>
-        Base Model:
-        <input
-          type="text"
-          value={baseModel}
-          onChange={(e) => setBaseModel(e.target.value)}
-          placeholder="ollama/llama2"
-        />
-      </label>
-    </div>
+      <div className={styles["settings-container"]}>
+        <label>
+          Base URL:
+          <input
+            type="text"
+            value={baseUrl}
+            onChange={(e) => setBaseUrl(e.target.value)}
+            placeholder="http://localhost:10001"
+          />
+        </label>
+        <label>
+          Base Model:
+          <input
+            type="text"
+            value={baseModel}
+            onChange={(e) => setBaseModel(e.target.value)}
+            placeholder="ollama/llama2"
+          />
+        </label>
+      </div>
 
-    <div className={styles["left-panel"]}>
-      <LocalChatManager
-        conversationHistory={conversationHistories[selectedCharacter] || []}
-        onSendMessage={handleSend}
-        onResetConversation={() => resetConversation(selectedCharacter)}
-        onRemoveLastInteraction={() => removeLastInteraction(selectedCharacter)}
-        apiKey={apiKey}
-        onApiKeyChange={(e) => setApiKey(e.target.value)}
-        loading={loading}
-        temporaryResponse={response} // Pass streamed response
-      />
-    </div>
+      <div className={styles["left-panel"]}>
+        <LocalChatManager
+          conversationHistory={conversationHistories[selectedCharacter] || []}
+          onSendMessage={handleSend}
+          onResetConversation={() => resetConversation(selectedCharacter)}
+          onRemoveLastInteraction={() => removeLastInteraction(selectedCharacter)}
+          apiKey={apiKey}
+          onApiKeyChange={(e) => setApiKey(e.target.value)}
+          loading={loading}
+          temporaryResponse={response}
+        />
+      </div>
 
-    <div className={styles["right-panel"]}>
-      <CharacterManager />
+      <div className={styles["right-panel"]}>
+        <CharacterManager />
+      </div>
     </div>
-  </div>
   );
 };
 

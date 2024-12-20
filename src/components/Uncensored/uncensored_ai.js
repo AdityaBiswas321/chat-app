@@ -1,94 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
+const LLMConnector = ({ onKeywordSelect }) => {
+  const [apiKey, setApiKey] = useState(""); // API key input
+  const [message, setMessage] = useState(""); // User's input message
+  const [response, setResponse] = useState(""); // AI's response
+  const [loadingMessage, setLoadingMessage] = useState(false); // Loading state for sending messages
+  const [loadingKey, setLoadingKey] = useState(false); // Loading state for generating API key
+  const [serverMessage, setServerMessage] = useState(""); // Server messages or errors
 
-const LLMConnector = ({ apiKey }) => {
-    const [inputText, setInputText] = useState('');
-    const [response, setResponse] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [conversationHistories, setConversationHistories] = useState({
-      default: [], // Maintain a default conversation history
-    });
-  
-    const handleSend = async (message) => {
-      if (!apiKey) {
-        setResponse("No API key provided. Please try again.");
+  // Function to generate an API key
+  const generateApiKey = async () => {
+    setLoadingKey(true); // Set loading state for the "Generate API Key" button
+    setServerMessage(""); // Clear previous server messages
+    try {
+      const response = await fetch("http://localhost:3000/generate-key", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setApiKey(data.apiKey);
+        setServerMessage(`API Key generated! Expires at: ${data.expiry}`);
+      } else {
+        setServerMessage("Failed to generate API key.");
+      }
+    } catch (error) {
+      console.error("Error generating API key:", error);
+      setServerMessage("An error occurred while generating the API key.");
+    } finally {
+      setLoadingKey(false); // Reset loading state
+    }
+  };
+
+  // Function to send a message to the AI with POST request
+  const sendMessage = async () => {
+    if (!apiKey) {
+      setServerMessage("Please generate or enter an API key first.");
+      return;
+    }
+    if (!message) {
+      setServerMessage("Please enter a message.");
+      return;
+    }
+
+    setLoadingMessage(true); // Set loading state for the "Send" button
+    setServerMessage(""); // Clear previous server messages
+    setResponse(""); // Clear the response before starting a new request
+
+    try {
+      const response = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey, message }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setServerMessage(errorData.error || "Failed to fetch response.");
+        setLoadingMessage(false);
         return;
       }
-  
-      setLoading(true);
-  
-      const updatedConversationHistory = [
-        ...conversationHistories.default,
-        { role: "user", content: message },
-      ];
-  
-      try {
-        const result = await fetch("http://localhost:3000/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": apiKey, // Pass the API key in the headers
-          },
-          body: JSON.stringify({
-            message,
-            history: updatedConversationHistory,
-          }),
-        });
-  
-        if (result.ok) {
-          const data = await result.json();
-          const aiResponse = data.response;
-          setResponse(aiResponse);
-  
-          // Append AI response to conversation history
-          const newConversationHistory = [
-            ...updatedConversationHistory,
-            { role: "assistant", content: aiResponse },
-          ];
-  
-          setConversationHistories({ default: newConversationHistory });
-        } else {
-          const errorData = await result.json();
-          setResponse(errorData.error || "Failed to fetch response.");
-        }
-      } catch (error) {
-        console.error("Error fetching chat response:", error);
-        setResponse("Failed to communicate with the server.");
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      let fullResponse = "";
+
+      // Read the streaming response body
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const cleanedChunk = chunk
+          .replace(/^data:\s*/gm, "") // Remove "data:" prefix
+          .replace(/\[DONE\]/g, "") // Remove "[DONE]"
+          .trim(); // Trim any leading/trailing whitespace
+
+        fullResponse += cleanedChunk;
+
+        // Process the chunk (append it to the response)
+        setResponse((prev) => prev + cleanedChunk);
       }
-  
-      setLoading(false);
-      setInputText(""); // Clear the input field
-    };
-  
-    return (
-      <div className="chat-container">
-        <div className="chat-history">
-          {conversationHistories.default.map((entry, index) => (
-            <div
-              key={index}
-              className={
-                entry.role === "user" ? "user-message" : "assistant-message"
-              }
-            >
-              <strong>{entry.role === "user" ? "You" : "AI"}:</strong>{" "}
-              {entry.content}
-            </div>
-          ))}
-        </div>
-  
-        <div className="input-section">
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type your message here"
-          />
-          <button onClick={() => handleSend(inputText)} disabled={loading}>
-            {loading ? "Sending..." : "Send"}
-          </button>
-        </div>
-      </div>
-    );
+
+      setResponse(fullResponse.trim()); // Finalize the full response
+    } catch (error) {
+      console.error("Error communicating with the AI:", error);
+      setServerMessage("An error occurred while communicating with the AI.");
+    } finally {
+      setLoadingMessage(false); // Reset loading state
+    }
   };
-  
-  export default LLMConnector;
-  
+
+  return (
+    <div className="ai-connector">
+      {/* Generate API Key Button */}
+      <div className="api-key-section">
+        <button onClick={generateApiKey} disabled={loadingKey}>
+          {loadingKey ? "Generating Key..." : "Generate API Key"}
+        </button>
+        {apiKey && (
+          <p>
+            <strong>Generated API Key:</strong> {apiKey}
+          </p>
+        )}
+      </div>
+
+      {/* API Key Input */}
+      <div className="api-key-input">
+        <input
+          type="text"
+          placeholder="Enter your API key"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+        />
+      </div>
+
+      {/* Message Input */}
+      <div className="message-section">
+        <textarea
+          placeholder="Type your message here..."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button onClick={sendMessage} disabled={loadingMessage}>
+          {loadingMessage ? "Sending..." : "Send"}
+        </button>
+      </div>
+
+      {/* Display Response */}
+      <div className="response-section">
+        <strong>AI Response:</strong>
+        <p>{response}</p>
+      </div>
+
+      {/* Server Messages */}
+      {serverMessage && <p className="server-message">{serverMessage}</p>}
+    </div>
+  );
+};
+
+export default LLMConnector;

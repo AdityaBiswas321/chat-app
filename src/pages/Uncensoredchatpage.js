@@ -1,62 +1,51 @@
 import React, { useState } from "react";
-import LLMConnector from "../components/Uncensored/uncensored_ai.js"; // Reusing the AI component
-// import "../App.css";
+import LLMConnector from "../components/Uncensored/uncensored_ai"; // Core AI component
+import HandyController from "../components/Chat/Hardcode"; // Secondary component
 
 function UncensoredChatPage() {
-  const [apiKey, setApiKey] = useState(""); // State for storing the API key
-  const [isKeyValid, setIsKeyValid] = useState(false); // Tracks if the API key is valid
-  const [serverMessage, setServerMessage] = useState(""); // Error messages from the server
+  const [selectedKeyword, setSelectedKeyword] = useState(""); // Keyword passed from LLMConnector
+  const [apiCallCount, setApiCallCount] = useState(0); // Track the number of API calls
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal for instructions/help
 
-  // Function to validate the API key
-  const validateKey = async () => {
-    if (!apiKey) {
-      setServerMessage("Please enter an API key.");
-      return;
-    }
-    try {
-      // Validate key with backend
-      const response = await fetch("http://localhost:3000/validate-key", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey }),
-      });
-
-      if (response.ok) {
-        setIsKeyValid(true);
-        setServerMessage("");
-      } else {
-        const data = await response.json();
-        setServerMessage(data.error || "Invalid API key.");
-      }
-    } catch (error) {
-      console.error("Error validating API key:", error);
-      setServerMessage("Failed to validate API key. Please try again.");
-    }
+  // Handle keyword selection from LLMConnector
+  const handleKeywordSelect = (keyword) => {
+    setSelectedKeyword(keyword);
+    setApiCallCount((prevCount) => prevCount + 1); // Increment API call counter
   };
+
+  const toggleModal = () => setIsModalOpen(!isModalOpen); // Toggle modal visibility
 
   return (
     <div className="App">
       <div className="header">
-        <h1>Uncensored Handy Augmented Chat - Underdevelopment</h1>
+        <h1>Uncensored Handy Augmented Chat</h1>
+        <span className="help-icon" onClick={toggleModal}>?</span>
       </div>
 
-      {/* {!isKeyValid ? (
-        // Display API key input screen
-        <div className="api-key-input">
-          <h3>Enter Your Uncensored API Key</h3>
-          <input
-            type="text"
-            placeholder="Enter your API key"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-          />
-          <button onClick={validateKey}>Validate Key</button>
-          {serverMessage && <p className="error-message">{serverMessage}</p>}
+      {/* HandyController receives the selected keyword and API call count */}
+      <HandyController
+        selectedKeyword={selectedKeyword}
+        apiCallCount={apiCallCount}
+      />
+
+      {/* LLMConnector handles the AI interaction and passes keywords */}
+      <LLMConnector onKeywordSelect={handleKeywordSelect} />
+
+      {/* Modal for Instructions */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={toggleModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>How to Use the App</h2>
+            <p>Welcome to Uncensored Handy Augmented Chat! Here are some basic instructions:</p>
+            <ul>
+              <li>Generate an API key to enable communication with the LLM.</li>
+              <li>Enter your message and interact with the AI.</li>
+              <li>Watch for keywords returned by the AI to control devices or trigger actions.</li>
+            </ul>
+            <button onClick={toggleModal}>Close</button>
+          </div>
         </div>
-      ) : (
-        // Once validated, load the chat component
-        <LLMConnector apiKey={apiKey} />
-      )} */}
+      )}
     </div>
   );
 }
